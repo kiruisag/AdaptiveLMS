@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Link } from 'react-router-dom';
-import { Loader2, BookOpen, ArrowLeft } from 'lucide-react';
+import { AppIcon } from '../../../components/ui/AppIcon';
 
 const forgotPasswordSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -27,7 +27,7 @@ export function ForgotPasswordPage() {
   return (
     <div className="w-full">
       <div className="mb-10 hidden lg:block">
-        <BookOpen className="w-10 h-10 text-indigo-600 mb-6" />
+        <AppIcon name="book-open" className="w-10 h-10 text-indigo-600 mb-6" />
         <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">Reset your password</h2>
         <p className="mt-2 text-slate-500 text-sm">Enter your email and we'll send you a link to reset your password.</p>
       </div>
@@ -45,7 +45,7 @@ export function ForgotPasswordPage() {
           </div>
           
           <Link to="/auth/login" className="inline-flex items-center text-sm font-semibold text-indigo-600 hover:text-indigo-500">
-            <ArrowLeft className="w-4 h-4 mr-2" />
+            <AppIcon name="arrow-left" className="w-4 h-4 mr-2" />
             Back to login
           </Link>
         </div>
@@ -71,7 +71,7 @@ export function ForgotPasswordPage() {
             >
               {isSubmitting ? (
                 <span className="flex items-center">
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  <AppIcon name="spinner" className="w-4 h-4 mr-2 animate-spin" />
                   Sending link...
                 </span>
               ) : (
@@ -82,7 +82,7 @@ export function ForgotPasswordPage() {
           
           <div className="text-center mt-6">
             <Link to="/auth/login" className="inline-flex items-center text-sm font-semibold text-slate-600 hover:text-slate-900">
-              <ArrowLeft className="w-4 h-4 mr-2" />
+              <AppIcon name="arrow-left" className="w-4 h-4 mr-2" />
               Back to login
             </Link>
           </div>

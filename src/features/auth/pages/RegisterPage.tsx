@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useNavigate, Link } from 'react-router-dom';
-import { Loader2, BookOpen } from 'lucide-react';
+import { AppIcon } from '../../../components/ui/AppIcon';
 import { authApi } from '../../../services/api/auth.api';
 
 const registerSchema = z.object({
@@ -42,7 +42,7 @@ export function RegisterPage() {
   return (
     <div className="w-full">
       <div className="mb-8 hidden lg:block">
-        <BookOpen className="w-10 h-10 text-indigo-600 mb-6" />
+        <AppIcon name="book-open" className="w-10 h-10 text-indigo-600 mb-6" />
         <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">Create your learning organization</h2>
         <p className="mt-2 text-slate-500 text-sm">Set up your organization and start delivering personalized learning with Adaptive LMS.</p>
       </div>
@@ -158,7 +158,7 @@ export function RegisterPage() {
           >
             {isSubmitting ? (
               <span className="flex items-center">
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                <AppIcon name="spinner" className="w-4 h-4 mr-2 animate-spin" />
                 Creating...
               </span>
             ) : (

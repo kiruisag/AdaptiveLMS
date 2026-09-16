@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { sendMessage } from '../api/ai.api';
 import { AIMessageDTO } from '../types/ai.types';
-import { Bot, User, Send, BrainCircuit, FileText, Loader2 } from 'lucide-react';
+import { AppIcon } from '../../../components/ui/AppIcon';
 import ReactMarkdown from 'react-markdown';
 
 export function AITutor() {
@@ -61,7 +61,7 @@ export function AITutor() {
       <div className="p-4 bg-slate-900 text-white flex items-center justify-between shrink-0">
         <div className="flex items-center space-x-3">
           <div className="bg-indigo-500 p-2 rounded-lg">
-            <BrainCircuit className="w-5 h-5 text-white" />
+            <AppIcon name="brain" className="w-5 h-5 text-white" />
           </div>
           <div>
             <h2 className="font-bold">AI Tutor</h2>
@@ -74,7 +74,7 @@ export function AITutor() {
         {messages.map((msg) => (
           <div key={msg.id} className={`flex items-start space-x-3 max-w-[85%] ${msg.role === 'user' ? 'ml-auto flex-row-reverse space-x-reverse' : ''}`}>
              <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-1 ${msg.role === 'user' ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-200 text-slate-700'}`}>
-               {msg.role === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+               {msg.role === 'user' ? <AppIcon name="user" className="w-4 h-4" /> : <AppIcon name="robot" className="w-4 h-4" />}
              </div>
              
              <div className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
@@ -90,7 +90,7 @@ export function AITutor() {
                    <div className="space-y-2">
                      {msg.sources.map(source => (
                        <a key={source.id} href={source.url || '#'} className="flex items-center space-x-2 text-xs hover:bg-slate-50 p-1.5 rounded transition-colors group border border-transparent hover:border-slate-100">
-                         <FileText className="w-3 h-3 text-indigo-500" />
+                         <AppIcon name="file-lines" className="w-3 h-3 text-indigo-500" />
                          <span className="font-medium text-slate-700 group-hover:text-indigo-600 truncate">{source.title}</span>
                          {source.page && <span className="text-slate-400 shrink-0">({source.page})</span>}
                        </a>
@@ -105,10 +105,10 @@ export function AITutor() {
         {isTyping && (
           <div className="flex items-start space-x-3 max-w-[85%]">
              <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-1 bg-slate-200 text-slate-700">
-               <Bot className="w-4 h-4" />
+               <AppIcon name="robot" className="w-4 h-4" />
              </div>
              <div className="bg-white border border-slate-200 p-4 rounded-2xl rounded-tl-none shadow-sm flex items-center space-x-2">
-               <Loader2 className="w-4 h-4 text-indigo-500 animate-spin" />
+               <AppIcon name="spinner" className="w-4 h-4 text-indigo-500 animate-spin" />
                <span className="text-sm text-slate-500 font-medium">Thinking...</span>
              </div>
           </div>
@@ -141,7 +141,7 @@ export function AITutor() {
              disabled={!input.trim() || isTyping}
              className="absolute right-2 top-2 p-1.5 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50 transition-colors"
            >
-             <Send className="w-4 h-4" />
+             <AppIcon name="paper-plane" className="w-4 h-4" />
            </button>
          </form>
       </div>

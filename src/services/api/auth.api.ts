@@ -1,25 +1,23 @@
 import { apiClient } from './client';
-import { UserDTO, TenantDTO } from '../../types/api.types';
+import { TenantDTO, UserDTO } from '../../types/api.types';
 
 export const authApi = {
   login: async (credentials: { email: string; password?: string }) => {
-    // In a real implementation:
-    // const { data } = await apiClient.post<{ user: UserDTO; token: string }>('/auth/login', credentials);
-    // return data;
-    
-    // MOCK IMPLEMENTATION
-    await new Promise(resolve => setTimeout(resolve, 800));
-    if (credentials.email.includes('error')) throw new Error('Invalid credentials');
-    
+    // Replace this mock with the real Laravel endpoint when the backend is available.
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    if (credentials.email.includes('error')) {
+      throw new Error('Invalid credentials');
+    }
+
     const mockTenants: TenantDTO[] = [
       { id: 't1', name: 'Acme University', slug: 'acme-u', type: 'university', role: 'learner' },
-      { id: 't2', name: 'Acme Training', slug: 'acme-training', type: 'corporate', role: 'instructor' }
+      { id: 't2', name: 'Acme Training', slug: 'acme-training', type: 'corporate', role: 'instructor' },
     ];
-    
-    let userRole = 'learner';
+
+    let userRole: UserDTO['role'] = 'learner';
     if (credentials.email.includes('admin')) userRole = 'sys_admin';
     if (credentials.email.includes('instructor')) userRole = 'instructor';
-    
+
     return {
       user: {
         id: '1',
@@ -28,34 +26,45 @@ export const authApi = {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         tenants: mockTenants,
-        role: userRole as any,
-      } as UserDTO,
-      token: 'mock-jwt-token-123'
+        role: userRole,
+      } satisfies UserDTO,
+      token: 'mock-jwt-token-123',
     };
   },
-  
+
   me: async () => {
-    // return (await apiClient.get<UserDTO>('/auth/me')).data;
-    await new Promise(resolve => setTimeout(resolve, 500));
-    const role = localStorage.getItem('mock_user_role') || 'learner';
-    const email = localStorage.getItem('mock_user_email') || 'learner@example.com';
+    // Real backend contract: GET /auth/me or /me returning the authenticated user.
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    const role = 'learner' as UserDTO['role'];
+    const email = 'learner@example.com';
+
     return {
-      id: "1",
-      name: role === 'sys_admin' ? "Test Admin" : "Test Learner",
-      email: email,
+      id: '1',
+      name: role === 'sys_admin' ? 'Test Admin' : 'Test Learner',
+      email,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       tenants: [
         { id: 't1', name: 'Acme University', slug: 'acme-u', type: 'university', role: 'learner' },
-        { id: 't2', name: 'Acme Training', slug: 'acme-training', type: 'corporate', role: 'instructor' }
+        { id: 't2', name: 'Acme Training', slug: 'acme-training', type: 'corporate', role: 'instructor' },
       ],
-      role: role as any,
-    } as UserDTO;
+      role,
+    } satisfies UserDTO;
   },
 
-  registerOrganization: async (data: any) => {
-    // MOCK
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    return { success: true };
-  }
+  logout: async () => {
+    // Real implementation: POST /auth/logout
+    return Promise.resolve();
+  },
+
+  loginWithGoogle: async () => {
+    return authApi.login({ email: 'google-user@example.com', password: 'google' });
+  },
+
+  registerOrganization: async (data: unknown) => {
+    // Mock registration: replace with the Laravel tenant registration endpoint.
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    return { success: true, data };
+  },
 };

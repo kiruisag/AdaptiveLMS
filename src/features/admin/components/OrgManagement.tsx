@@ -1,5 +1,5 @@
 import React from 'react';
-import { Building2, Search, Plus, Filter, MoreVertical, CreditCard, Users, Link as LinkIcon } from 'lucide-react';
+import { AppIcon } from '../../../components/ui/AppIcon';
 
 const mockOrgs = [
   { id: 'org_1', name: 'Acme Corp', domain: 'acme.com', plan: 'Enterprise', users: 1250, status: 'active', joined: 'Oct 2023' },
@@ -18,7 +18,7 @@ export function OrgManagement() {
         </div>
         <div className="flex items-center space-x-3">
           <button className="flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-            <Plus className="w-4 h-4" />
+            <AppIcon name="plus" className="w-4 h-4" />
             <span>Create Organization</span>
           </button>
         </div>
@@ -27,7 +27,7 @@ export function OrgManagement() {
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="p-4 border-b border-slate-200 flex flex-col sm:flex-row gap-4 items-center justify-between bg-slate-50">
           <div className="relative w-full sm:w-96">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <AppIcon name="magnifying-glass" className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input 
               type="text" 
               placeholder="Search organizations..." 
@@ -35,7 +35,7 @@ export function OrgManagement() {
             />
           </div>
           <button className="flex items-center space-x-2 px-4 py-2 border border-slate-300 rounded-lg bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors shrink-0">
-            <Filter className="w-4 h-4 text-slate-500" />
+            <AppIcon name="filter" className="w-4 h-4 text-slate-500" />
             <span>Filters</span>
           </button>
         </div>
@@ -57,12 +57,12 @@ export function OrgManagement() {
                   <td className="px-6 py-4">
                     <div className="flex items-center space-x-3">
                       <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0">
-                        <Building2 className="w-5 h-5 text-slate-600" />
+                        <AppIcon name="building" className="w-5 h-5 text-slate-600" />
                       </div>
                       <div>
                         <p className="text-sm font-semibold text-slate-900">{org.name}</p>
                         <p className="text-xs text-slate-500 flex items-center mt-0.5">
-                          <LinkIcon className="w-3 h-3 mr-1" />
+                          <AppIcon name="link" className="w-3 h-3 mr-1" />
                           {org.domain}
                         </p>
                       </div>
@@ -70,13 +70,13 @@ export function OrgManagement() {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center">
-                      <CreditCard className="w-4 h-4 mr-2 text-slate-400" />
+                      <AppIcon name="credit-card" className="w-4 h-4 mr-2 text-slate-400" />
                       <span className="text-sm font-medium text-slate-700">{org.plan}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center text-sm text-slate-700 font-medium">
-                      <Users className="w-4 h-4 mr-2 text-slate-400" />
+                      <AppIcon name="users" className="w-4 h-4 mr-2 text-slate-400" />
                       {org.users.toLocaleString()}
                     </div>
                   </td>
@@ -91,7 +91,7 @@ export function OrgManagement() {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <button className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
-                      <MoreVertical className="w-4 h-4" />
+                      <AppIcon name="ellipsis-vertical" className="w-4 h-4" />
                     </button>
                   </td>
                 </tr>

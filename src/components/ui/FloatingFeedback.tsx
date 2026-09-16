@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageSquare, X, Send, Bug, Lightbulb, CheckCircle } from 'lucide-react';
+import { AppIcon } from './AppIcon';
 
 export function FloatingFeedback() {
   const [isOpen, setIsOpen] = useState(false);
@@ -53,14 +53,14 @@ export function FloatingFeedback() {
         >
           <div className="bg-indigo-600 p-4 flex items-center justify-between text-white">
             <h3 className="font-semibold flex items-center gap-2">
-              <MessageSquare className="w-4 h-4" />
+              <AppIcon name="message" className="w-4 h-4" />
               Send Feedback
             </h3>
             <button 
               onClick={() => setIsOpen(false)}
               className="p-1 hover:bg-indigo-500 rounded-full transition-colors"
             >
-              <X className="w-4 h-4" />
+              <AppIcon name="xmark" className="w-4 h-4" />
             </button>
           </div>
           
@@ -68,7 +68,7 @@ export function FloatingFeedback() {
             {isSuccess ? (
               <div className="flex flex-col items-center justify-center py-6 text-center space-y-3">
                 <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                  <CheckCircle className="w-6 h-6 text-green-600" />
+                  <AppIcon name="circle-check" className="w-6 h-6 text-green-600" />
                 </div>
                 <div>
                   <p className="font-semibold text-slate-900">Thank you!</p>
@@ -87,7 +87,7 @@ export function FloatingFeedback() {
                         : 'text-slate-500 hover:text-slate-700'
                     }`}
                   >
-                    <Bug className="w-4 h-4" />
+                    <AppIcon name="bug" className="w-4 h-4" />
                     Issue
                   </button>
                   <button
@@ -99,7 +99,7 @@ export function FloatingFeedback() {
                         : 'text-slate-500 hover:text-slate-700'
                     }`}
                   >
-                    <Lightbulb className="w-4 h-4" />
+                    <AppIcon name="lightbulb" className="w-4 h-4" />
                     Idea
                   </button>
                 </div>
@@ -123,7 +123,7 @@ export function FloatingFeedback() {
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   ) : (
                     <>
-                      <Send className="w-4 h-4" />
+                      <AppIcon name="paper-plane" className="w-4 h-4" />
                       Submit
                     </>
                   )}
@@ -140,7 +140,7 @@ export function FloatingFeedback() {
         className="w-14 h-14 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
         aria-label="Send Feedback"
       >
-        {isOpen ? <X className="w-6 h-6" /> : <MessageSquare className="w-6 h-6" />}
+        {isOpen ? <AppIcon name="xmark" className="w-6 h-6" /> : <AppIcon name="message" className="w-6 h-6" />}
       </button>
     </div>
   );

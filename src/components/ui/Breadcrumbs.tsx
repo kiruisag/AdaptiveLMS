@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ChevronRight, Home } from 'lucide-react';
+import { AppIcon } from './AppIcon';
 
 export function Breadcrumbs() {
   const location = useLocation();
@@ -28,7 +28,7 @@ export function Breadcrumbs() {
   return (
     <nav className="flex items-center space-x-1 text-sm text-slate-500 overflow-hidden" aria-label="Breadcrumb">
       <Link to="/" className="flex items-center p-1 rounded-md hover:bg-slate-100 hover:text-indigo-600 transition-colors shrink-0">
-        <Home className="w-4 h-4" />
+        <AppIcon name="house" className="w-4 h-4" />
       </Link>
       
       {pathnames.length > 0 && pathnames.map((value, index) => {
@@ -38,7 +38,7 @@ export function Breadcrumbs() {
 
         return (
           <div key={to} className="flex items-center space-x-1 overflow-hidden">
-            <ChevronRight className="w-4 h-4 text-slate-300 shrink-0" />
+            <AppIcon name="chevron-right" className="w-4 h-4 text-slate-300 shrink-0" />
             {isLast ? (
               <span className="font-medium text-slate-900 truncate px-1" aria-current="page">
                 {label}

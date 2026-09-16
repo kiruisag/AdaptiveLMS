@@ -1,5 +1,5 @@
 import React from 'react';
-import { Trophy, Target, Award, ArrowUpRight, CheckCircle2 } from 'lucide-react';
+import { AppIcon } from '../../../components/ui/AppIcon';
 import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 
 const masteryData = [
@@ -35,20 +35,20 @@ export function LearnerProgress() {
          <div className="bg-indigo-600 text-white rounded-2xl p-6 shadow-sm border border-indigo-700 flex flex-col justify-between">
            <div>
              <div className="bg-white/20 w-10 h-10 rounded-full flex items-center justify-center mb-4">
-               <Trophy className="w-5 h-5 text-white" />
+               <AppIcon name="trophy" className="w-5 h-5 text-white" />
              </div>
              <p className="text-indigo-200 font-medium text-sm">Overall Mastery</p>
              <p className="text-4xl font-bold mt-1">76%</p>
            </div>
            <div className="mt-6 flex items-center text-sm font-medium text-indigo-100 bg-white/10 py-1.5 px-3 rounded-full w-fit">
-             <ArrowUpRight className="w-4 h-4 mr-1" />
+             <AppIcon name="arrow-up-right" className="w-4 h-4 mr-1" />
              <span>+4% this week</span>
            </div>
          </div>
          
          <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
            <div className="bg-orange-100 w-10 h-10 rounded-full flex items-center justify-center mb-4">
-             <Target className="w-5 h-5 text-orange-600" />
+             <AppIcon name="bullseye" className="w-5 h-5 text-orange-600" />
            </div>
            <p className="text-slate-500 font-medium text-sm">Learning Hours</p>
            <p className="text-3xl font-bold text-slate-900 mt-1">32h 45m</p>
@@ -57,7 +57,7 @@ export function LearnerProgress() {
          
          <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
            <div className="bg-green-100 w-10 h-10 rounded-full flex items-center justify-center mb-4">
-             <Award className="w-5 h-5 text-green-600" />
+             <AppIcon name="medal" className="w-5 h-5 text-green-600" />
            </div>
            <p className="text-slate-500 font-medium text-sm">Certificates Earned</p>
            <p className="text-3xl font-bold text-slate-900 mt-1">4</p>
@@ -111,7 +111,7 @@ export function LearnerProgress() {
              <div key={i} className="flex items-center justify-between p-4 rounded-xl border border-slate-100 bg-slate-50">
                <div>
                  <div className="flex items-center space-x-2">
-                   <CheckCircle2 className="w-5 h-5 text-green-500" />
+                   <AppIcon name="circle-check" className="w-5 h-5 text-green-500" />
                    <h4 className="font-semibold text-slate-900">{course.title}</h4>
                  </div>
                  <p className="text-sm text-slate-500 mt-1 ml-7">Completed {course.date}</p>

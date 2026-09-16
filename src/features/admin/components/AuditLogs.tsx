@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldAlert, Search, Filter, Clock, ArrowRight, User } from 'lucide-react';
+import { AppIcon } from '../../../components/ui/AppIcon';
 
 const mockLogs = [
   { id: 'log_1', action: 'system.settings.update', resource: 'Global Auth Config', actor: 'Sarah Connor', ip: '192.168.1.1', time: '10 mins ago', status: 'success' },
@@ -25,7 +25,7 @@ export function AuditLogs() {
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="p-4 border-b border-slate-200 flex flex-col sm:flex-row gap-4 items-center justify-between bg-slate-50">
           <div className="relative w-full sm:w-[500px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <AppIcon name="magnifying-glass" className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input 
               type="text" 
               placeholder="Search by action, resource, or IP address..." 
@@ -33,7 +33,7 @@ export function AuditLogs() {
             />
           </div>
           <button className="flex items-center space-x-2 px-4 py-2 border border-slate-300 rounded-lg bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors shrink-0">
-            <Filter className="w-4 h-4 text-slate-500" />
+            <AppIcon name="filter" className="w-4 h-4 text-slate-500" />
             <span>Advanced Filters</span>
           </button>
         </div>
@@ -54,7 +54,7 @@ export function AuditLogs() {
                 <tr key={log.id} className="hover:bg-slate-50 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center text-sm text-slate-500">
-                      <Clock className="w-4 h-4 mr-2 text-slate-400" />
+                      <AppIcon name="clock" className="w-4 h-4 mr-2 text-slate-400" />
                       {log.time}
                     </div>
                   </td>
@@ -62,14 +62,14 @@ export function AuditLogs() {
                     <div>
                       <p className="text-sm font-mono font-semibold text-slate-900">{log.action}</p>
                       <div className="flex items-center mt-1 text-xs text-slate-500">
-                        <ArrowRight className="w-3 h-3 mr-1" />
+                        <AppIcon name="arrow-right" className="w-3 h-3 mr-1" />
                         {log.resource}
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center text-sm font-medium text-slate-700">
-                      <User className="w-4 h-4 mr-2 text-slate-400" />
+                      <AppIcon name="user" className="w-4 h-4 mr-2 text-slate-400" />
                       {log.actor}
                     </div>
                   </td>

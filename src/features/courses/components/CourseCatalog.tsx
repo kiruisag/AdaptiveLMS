@@ -1,6 +1,6 @@
 import React from 'react';
 import { useCourses } from '../hooks/useCourses';
-import { BookOpen, Clock, BarChart, User } from 'lucide-react';
+import { AppIcon } from '../../../components/ui/AppIcon';
 import { Link } from 'react-router-dom';
 import { FullPageLoader } from '../../../components/ui/LoadingSpinner';
 
@@ -43,7 +43,7 @@ export function CourseCatalog() {
           <div key={course.id} className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-shadow flex flex-col">
             <Link to={`/courses/${course.id}`} className="h-40 bg-slate-100 relative block">
                <div className="absolute inset-0 flex items-center justify-center">
-                  <BookOpen className="w-12 h-12 text-slate-300" />
+                  <AppIcon name="book-open" className="w-12 h-12 text-slate-300" />
                </div>
                <div className="absolute top-3 left-3">
                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-white text-slate-800 shadow-sm">
@@ -60,15 +60,15 @@ export function CourseCatalog() {
               
               <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 mb-5 mt-auto">
                 <div className="flex items-center gap-1">
-                  <Clock className="w-4 h-4" />
+                  <AppIcon name="clock" className="w-4 h-4" />
                   <span>{Math.floor(course.duration_minutes / 60)}h {course.duration_minutes % 60}m</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <BarChart className="w-4 h-4" />
+                  <AppIcon name="chart-column" className="w-4 h-4" />
                   <span className="capitalize">{course.difficulty}</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <User className="w-4 h-4" />
+                  <AppIcon name="user" className="w-4 h-4" />
                   <span>{course.instructor_name}</span>
                 </div>
               </div>
@@ -104,7 +104,7 @@ export function CourseCatalog() {
       
       {data?.data.length === 0 && (
          <div className="text-center py-12 bg-white rounded-lg border border-slate-200">
-           <BookOpen className="mx-auto h-12 w-12 text-slate-300" />
+           <AppIcon name="book-open" className="mx-auto h-12 w-12 text-slate-300" />
            <h3 className="mt-2 text-sm font-medium text-slate-900">No courses found</h3>
            <p className="mt-1 text-sm text-slate-500">Try adjusting your search or filters.</p>
          </div>

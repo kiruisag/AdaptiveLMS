@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Command, BookOpen, Settings, Users, ArrowRight, X } from 'lucide-react';
+import { AppIcon } from './AppIcon';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/auth.store';
 
@@ -68,7 +68,7 @@ export function GlobalSearch() {
         className={`relative flex items-center w-full transition-all duration-200 ${isOpen ? 'ring-2 ring-indigo-500 rounded-lg' : ''}`}
       >
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <Search className="h-4 w-4 text-slate-400" />
+          <AppIcon name="magnifying-glass" className="h-4 w-4 text-slate-400" />
         </div>
         <input
           ref={inputRef}
@@ -81,7 +81,7 @@ export function GlobalSearch() {
         />
         <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
           <span className="text-slate-400 sm:text-xs text-[10px] font-medium border border-slate-200 rounded px-1.5 py-0.5 bg-white flex items-center gap-1 shadow-sm">
-            <Command className="w-3 h-3" />K
+            <AppIcon name="keyboard" className="w-3 h-3" />K
           </span>
         </div>
       </div>
@@ -91,7 +91,7 @@ export function GlobalSearch() {
           <div className="max-h-[60vh] overflow-y-auto p-2">
             {!query ? (
               <div className="p-4 text-center text-sm text-slate-500">
-                <Search className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+                <AppIcon name="magnifying-glass" className="w-8 h-8 text-slate-300 mx-auto mb-2" />
                 <p>Start typing to search across the platform...</p>
                 <div className="flex flex-wrap items-center justify-center gap-2 mt-4">
                   <span className="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded-full">React</span>
@@ -113,11 +113,11 @@ export function GlobalSearch() {
                         >
                           <div className="flex items-center gap-3">
                             <div className="p-1.5 bg-indigo-50 text-indigo-600 rounded-md">
-                              <BookOpen className="w-4 h-4" />
+                              <AppIcon name="book-open" className="w-4 h-4" />
                             </div>
                             <span className="font-medium">{course.title}</span>
                           </div>
-                          <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity text-indigo-400" />
+                          <AppIcon name="arrow-right" className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity text-indigo-400" />
                         </button>
                       </li>
                     ))}
@@ -137,11 +137,11 @@ export function GlobalSearch() {
                           >
                             <div className="flex items-center gap-3">
                               <div className="p-1.5 bg-slate-100 text-slate-600 rounded-md">
-                                {setting.title.includes('User') ? <Users className="w-4 h-4" /> : <Settings className="w-4 h-4" />}
+                                {setting.title.includes('User') ? <AppIcon name="users" className="w-4 h-4" /> : <AppIcon name="gear" className="w-4 h-4" />}
                               </div>
                               <span className="font-medium">{setting.title}</span>
                             </div>
-                            <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity text-indigo-400" />
+                            <AppIcon name="arrow-right" className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity text-indigo-400" />
                           </button>
                         </li>
                       ))}

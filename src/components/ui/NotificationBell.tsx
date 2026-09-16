@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Bell, X, CheckCircle, AlertTriangle, Info, Clock } from 'lucide-react';
+import { AppIcon } from './AppIcon';
 
 const mockNotifications = [
   { id: '1', title: 'New Course Available', description: 'Advanced Machine Learning has been added to your curriculum.', type: 'info', time: '10 mins ago', read: false },
@@ -42,7 +42,7 @@ export function NotificationBell() {
         className="relative p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors focus:outline-none"
         aria-label="Notifications"
       >
-        <Bell className="w-5 h-5" />
+        <AppIcon name="bell" className="w-5 h-5" />
         {unreadCount > 0 && (
           <span className="absolute top-1.5 right-1.5 flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
@@ -74,7 +74,7 @@ export function NotificationBell() {
             onClick={() => setIsOpen(false)}
             className="p-1 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors"
           >
-            <X className="w-5 h-5" />
+            <AppIcon name="xmark" className="w-5 h-5" />
           </button>
         </div>
 
@@ -86,9 +86,9 @@ export function NotificationBell() {
                 className={`p-4 rounded-xl border ${notification.read ? 'bg-white border-slate-200' : 'bg-indigo-50/50 border-indigo-100 shadow-sm'} flex items-start gap-3`}
               >
                 <div className="shrink-0 mt-0.5">
-                  {notification.type === 'info' && <Info className="w-5 h-5 text-blue-500" />}
-                  {notification.type === 'success' && <CheckCircle className="w-5 h-5 text-green-500" />}
-                  {notification.type === 'warning' && <AlertTriangle className="w-5 h-5 text-orange-500" />}
+                  {notification.type === 'info' && <AppIcon name="circle-info" className="w-5 h-5 text-blue-500" />}
+                  {notification.type === 'success' && <AppIcon name="circle-check" className="w-5 h-5 text-green-500" />}
+                  {notification.type === 'warning' && <AppIcon name="triangle-exclamation" className="w-5 h-5 text-orange-500" />}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className={`text-sm font-semibold ${notification.read ? 'text-slate-700' : 'text-slate-900'}`}>
@@ -98,7 +98,7 @@ export function NotificationBell() {
                     {notification.description}
                   </p>
                   <div className="flex items-center gap-1 mt-2 text-xs text-slate-400 font-medium">
-                    <Clock className="w-3 h-3" />
+                    <AppIcon name="clock" className="w-3 h-3" />
                     <span>{notification.time}</span>
                   </div>
                 </div>
@@ -109,7 +109,7 @@ export function NotificationBell() {
             ))
           ) : (
             <div className="flex flex-col items-center justify-center h-full text-slate-500 space-y-3">
-              <Bell className="w-12 h-12 text-slate-300" />
+              <AppIcon name="bell" className="w-12 h-12 text-slate-300" />
               <p>No notifications right now.</p>
             </div>
           )}

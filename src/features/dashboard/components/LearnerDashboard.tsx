@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAuthStore } from '../../../stores/auth.store';
-import { BookOpen, Trophy, Clock, Target, Play } from 'lucide-react';
+import { AppIcon } from '../../../components/ui/AppIcon';
 
 export function LearnerDashboard() {
   const { user } = useAuthStore();
@@ -18,7 +18,7 @@ export function LearnerDashboard() {
         {/* Metric Cards */}
         <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200 flex items-center space-x-4">
           <div className="bg-indigo-100 p-3 rounded-full">
-            <Trophy className="w-6 h-6 text-indigo-600" />
+            <AppIcon name="trophy" className="w-6 h-6 text-indigo-600" />
           </div>
           <div>
             <p className="text-sm font-medium text-slate-500">Learning Streak</p>
@@ -28,7 +28,7 @@ export function LearnerDashboard() {
         
         <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200 flex items-center space-x-4">
           <div className="bg-green-100 p-3 rounded-full">
-            <Target className="w-6 h-6 text-green-600" />
+            <AppIcon name="bullseye" className="w-6 h-6 text-green-600" />
           </div>
           <div>
             <p className="text-sm font-medium text-slate-500">Avg. Mastery</p>
@@ -38,7 +38,7 @@ export function LearnerDashboard() {
         
         <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200 flex items-center space-x-4">
           <div className="bg-blue-100 p-3 rounded-full">
-            <BookOpen className="w-6 h-6 text-blue-600" />
+            <AppIcon name="book-open" className="w-6 h-6 text-blue-600" />
           </div>
           <div>
             <p className="text-sm font-medium text-slate-500">Courses Completed</p>
@@ -48,7 +48,7 @@ export function LearnerDashboard() {
         
         <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200 flex items-center space-x-4">
           <div className="bg-orange-100 p-3 rounded-full">
-            <Clock className="w-6 h-6 text-orange-600" />
+            <AppIcon name="clock" className="w-6 h-6 text-orange-600" />
           </div>
           <div>
             <p className="text-sm font-medium text-slate-500">Learning Hours</p>
@@ -64,7 +64,7 @@ export function LearnerDashboard() {
             <h2 className="text-lg font-bold text-slate-900 mb-4">Continue Learning</h2>
             <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden hover:border-indigo-300 transition-colors cursor-pointer flex flex-col sm:flex-row">
               <div className="w-full sm:w-48 h-32 bg-slate-100 flex items-center justify-center shrink-0 border-r border-slate-100">
-                <BookOpen className="w-12 h-12 text-slate-300" />
+                <AppIcon name="book-open" className="w-12 h-12 text-slate-300" />
               </div>
               <div className="p-4 flex-1 flex flex-col justify-between">
                 <div>
@@ -87,7 +87,7 @@ export function LearnerDashboard() {
                       <p className="text-xs text-slate-500 mt-1">45% Complete</p>
                    </div>
                    <button className="flex items-center space-x-1 text-sm font-medium text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-md transition-colors">
-                     <Play className="w-4 h-4" />
+                     <AppIcon name="play" className="w-4 h-4" />
                      <span>Resume</span>
                    </button>
                 </div>
@@ -104,7 +104,7 @@ export function LearnerDashboard() {
             <div className="bg-indigo-50 border border-indigo-100 rounded-lg p-4">
               <div className="flex items-start space-x-3">
                 <div className="bg-indigo-600 p-2 rounded-lg shrink-0 mt-1">
-                  <Target className="w-5 h-5 text-white" />
+                  <AppIcon name="bullseye" className="w-5 h-5 text-white" />
                 </div>
                 <div>
                   <h4 className="font-semibold text-slate-900 text-sm">Equivalent Fractions Practice</h4>

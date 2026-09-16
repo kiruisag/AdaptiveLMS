@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useNextActivity } from '../hooks/useLearning';
-import { ArrowLeft, CheckCircle, BrainCircuit, PlayCircle, FileText, ChevronRight } from 'lucide-react';
+import { AppIcon } from '../../../components/ui/AppIcon';
 import { toast } from 'sonner';
 import { FullPageLoader } from '../../../components/ui/LoadingSpinner';
 
@@ -29,10 +29,10 @@ export function LearningPlayer() {
 
   const getActivityIcon = (type: string) => {
     switch(type) {
-      case 'video': return <PlayCircle className="w-8 h-8 text-indigo-600" />;
-      case 'reading': return <FileText className="w-8 h-8 text-indigo-600" />;
-      case 'practice': return <CheckCircle className="w-8 h-8 text-indigo-600" />;
-      default: return <BrainCircuit className="w-8 h-8 text-indigo-600" />;
+      case 'video': return <AppIcon name="circle-play" className="w-8 h-8 text-indigo-600" />;
+      case 'reading': return <AppIcon name="file-lines" className="w-8 h-8 text-indigo-600" />;
+      case 'practice': return <AppIcon name="circle-check" className="w-8 h-8 text-indigo-600" />;
+      default: return <AppIcon name="brain" className="w-8 h-8 text-indigo-600" />;
     }
   };
 
@@ -40,7 +40,7 @@ export function LearningPlayer() {
     <div className="flex flex-col h-full space-y-6">
       <div className="flex items-center space-x-4">
         <Link to="/courses" className="p-2 hover:bg-slate-200 rounded-full transition-colors">
-          <ArrowLeft className="w-5 h-5 text-slate-600" />
+          <AppIcon name="arrow-left" className="w-5 h-5 text-slate-600" />
         </Link>
         <div>
           <h1 className="text-xl font-bold text-slate-900">Learning Session</h1>
@@ -54,15 +54,15 @@ export function LearningPlayer() {
           <h3 className="font-bold text-slate-900">Course Outline</h3>
           <div className="space-y-2 text-sm overflow-y-auto">
              <div className="flex items-center space-x-2 text-slate-400">
-               <CheckCircle className="w-4 h-4 text-green-500" />
+               <AppIcon name="circle-check" className="w-4 h-4 text-green-500" />
                <span className="line-through">Module 1: Basics</span>
              </div>
              <div className="flex items-center space-x-2 text-slate-400">
-               <CheckCircle className="w-4 h-4 text-green-500" />
+               <AppIcon name="circle-check" className="w-4 h-4 text-green-500" />
                <span className="line-through">Module 2: Formulas</span>
              </div>
              <div className="flex items-start space-x-2 text-slate-900 font-medium">
-               <ChevronRight className="w-4 h-4 text-indigo-600 mt-0.5" />
+               <AppIcon name="chevron-right" className="w-4 h-4 text-indigo-600 mt-0.5" />
                <span>Module 3: Current Focus<br/><span className="text-xs text-slate-500 font-normal">Adaptive Path</span></span>
              </div>
              <div className="flex items-center space-x-2 text-slate-400 ml-6">
@@ -73,7 +73,7 @@ export function LearningPlayer() {
           
           <div className="mt-auto pt-4 border-t border-slate-100">
              <div className="bg-indigo-50 p-3 rounded-lg flex items-start space-x-3">
-               <BrainCircuit className="w-5 h-5 text-indigo-600 shrink-0 mt-0.5" />
+               <AppIcon name="brain" className="w-5 h-5 text-indigo-600 shrink-0 mt-0.5" />
                <div>
                  <p className="text-xs font-semibold text-indigo-900">AI Tutor Active</p>
                  <p className="text-xs text-indigo-700 mt-1">Monitoring mastery in real-time.</p>
@@ -137,7 +137,7 @@ export function LearningPlayer() {
                     className="py-2 px-6 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 transition-colors flex items-center space-x-2"
                   >
                     <span>Complete Activity</span>
-                    <CheckCircle className="w-4 h-4" />
+                    <AppIcon name="circle-check" className="w-4 h-4" />
                   </button>
                </div>
             </div>

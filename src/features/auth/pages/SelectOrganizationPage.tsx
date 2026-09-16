@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../stores/auth.store';
 import { useTenant } from '../../../app/providers/TenantProvider';
-import { Building2, ChevronRight, BookOpen } from 'lucide-react';
+import { AppIcon } from '../../../components/ui/AppIcon';
 import { TenantDTO } from '../../../types/api.types';
 
 export function SelectOrganizationPage() {
@@ -42,7 +42,7 @@ export function SelectOrganizationPage() {
   return (
     <div className="w-full animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="mb-8 hidden lg:block">
-        <BookOpen className="w-10 h-10 text-indigo-600 mb-6" />
+        <AppIcon name="book-open" className="w-10 h-10 text-indigo-600 mb-6" />
         <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">Select Organization</h2>
         <p className="mt-2 text-slate-500 text-sm">Where would you like to continue?</p>
       </div>
@@ -61,7 +61,7 @@ export function SelectOrganizationPage() {
           >
             <div className="flex items-center space-x-4">
               <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center border border-indigo-100 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-                <Building2 className="w-6 h-6" />
+                <AppIcon name="building" className="w-6 h-6" />
               </div>
               <div>
                 <h3 className="text-base font-semibold text-slate-900">{tenant.name}</h3>
@@ -69,7 +69,7 @@ export function SelectOrganizationPage() {
               </div>
             </div>
             <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-indigo-50 transition-colors">
-              <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-indigo-600" />
+              <AppIcon name="chevron-right" className="w-5 h-5 text-slate-400 group-hover:text-indigo-600" />
             </div>
           </button>
         ))}

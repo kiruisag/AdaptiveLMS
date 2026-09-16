@@ -1,5 +1,5 @@
 import React from 'react';
-import { Loader2 } from 'lucide-react';
+import { AppIcon } from './AppIcon';
 import { cn } from '../../lib/utils';
 
 interface LoadingSpinnerProps {
@@ -18,7 +18,7 @@ const sizeClasses = {
 export function LoadingSpinner({ size = 'md', className, text }: LoadingSpinnerProps) {
   return (
     <div className={cn('flex flex-col items-center justify-center space-y-3', className)}>
-      <Loader2 className={cn('animate-spin text-indigo-600', sizeClasses[size])} />
+      <AppIcon name="spinner" className={cn('animate-spin text-indigo-600', sizeClasses[size])} />
       {text && <span className="text-sm font-medium text-slate-500 animate-pulse">{text}</span>}
     </div>
   );

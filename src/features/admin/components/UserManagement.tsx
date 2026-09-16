@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Plus, Filter, MoreVertical, Shield, User, Mail, CheckCircle, XCircle } from 'lucide-react';
+import { AppIcon } from '../../../components/ui/AppIcon';
 
 const mockUsers = [
   { id: '1', name: 'Sarah Connor', email: 'sarah@example.com', role: 'sys_admin', status: 'active', lastActive: '2 mins ago' },
@@ -19,7 +19,7 @@ export function UserManagement() {
         </div>
         <div className="flex items-center space-x-3">
           <button className="flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-            <Plus className="w-4 h-4" />
+            <AppIcon name="plus" className="w-4 h-4" />
             <span>Invite User</span>
           </button>
         </div>
@@ -28,7 +28,7 @@ export function UserManagement() {
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="p-4 border-b border-slate-200 flex flex-col sm:flex-row gap-4 items-center justify-between bg-slate-50">
           <div className="relative w-full sm:w-96">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <AppIcon name="magnifying-glass" className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input 
               type="text" 
               placeholder="Search by name or email..." 
@@ -36,7 +36,7 @@ export function UserManagement() {
             />
           </div>
           <button className="flex items-center space-x-2 px-4 py-2 border border-slate-300 rounded-lg bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors shrink-0">
-            <Filter className="w-4 h-4 text-slate-500" />
+            <AppIcon name="filter" className="w-4 h-4 text-slate-500" />
             <span>Filters</span>
           </button>
         </div>
@@ -63,7 +63,7 @@ export function UserManagement() {
                       <div>
                         <p className="text-sm font-semibold text-slate-900">{user.name}</p>
                         <p className="text-xs text-slate-500 flex items-center mt-0.5">
-                          <Mail className="w-3 h-3 mr-1" />
+                          <AppIcon name="envelope" className="w-3 h-3 mr-1" />
                           {user.email}
                         </p>
                       </div>
@@ -71,7 +71,7 @@ export function UserManagement() {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center">
-                      <Shield className={`w-4 h-4 mr-2 ${user.role === 'sys_admin' ? 'text-red-500' : 'text-slate-400'}`} />
+                      <AppIcon name="shield" className={`w-4 h-4 mr-2 ${user.role === 'sys_admin' ? 'text-red-500' : 'text-slate-400'}`} />
                       <span className="text-sm font-medium text-slate-700">
                         {user.role.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
                       </span>
@@ -80,12 +80,12 @@ export function UserManagement() {
                   <td className="px-6 py-4">
                     {user.status === 'active' ? (
                       <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
-                        <CheckCircle className="w-3 h-3" />
+                        <AppIcon name="circle-check" className="w-3 h-3" />
                         <span>Active</span>
                       </span>
                     ) : (
                       <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">
-                        <XCircle className="w-3 h-3" />
+                        <AppIcon name="circle-xmark" className="w-3 h-3" />
                         <span>Inactive</span>
                       </span>
                     )}
@@ -95,7 +95,7 @@ export function UserManagement() {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <button className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
-                      <MoreVertical className="w-4 h-4" />
+                      <AppIcon name="ellipsis-vertical" className="w-4 h-4" />
                     </button>
                   </td>
                 </tr>

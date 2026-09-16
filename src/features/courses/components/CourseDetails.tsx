@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { BookOpen, Clock, BarChart, User, CheckCircle, Play } from 'lucide-react';
+import { AppIcon } from '../../../components/ui/AppIcon';
 import { useCourses } from '../hooks/useCourses';
 import { FullPageLoader } from '../../../components/ui/LoadingSpinner';
 
@@ -35,15 +35,15 @@ export function CourseDetails() {
         
         <div className="flex flex-wrap items-center gap-6 text-sm text-slate-300 border-t border-slate-800 pt-6">
           <div className="flex items-center gap-2">
-            <User className="w-5 h-5 text-indigo-400" />
+            <AppIcon name="user" className="w-5 h-5 text-indigo-400" />
             <span>Instructor: <span className="text-white font-medium">{course.instructor_name}</span></span>
           </div>
           <div className="flex items-center gap-2">
-            <Clock className="w-5 h-5 text-indigo-400" />
+            <AppIcon name="clock" className="w-5 h-5 text-indigo-400" />
             <span>{Math.floor(course.duration_minutes / 60)}h {course.duration_minutes % 60}m</span>
           </div>
           <div className="flex items-center gap-2">
-            <BarChart className="w-5 h-5 text-indigo-400" />
+            <AppIcon name="chart-column" className="w-5 h-5 text-indigo-400" />
             <span className="capitalize">{course.difficulty} Level</span>
           </div>
         </div>
@@ -62,7 +62,7 @@ export function CourseDetails() {
                 "Complete a capstone project demonstrating mastery."
               ].map((objective, i) => (
                 <li key={i} className="flex items-start space-x-3 text-slate-700">
-                  <CheckCircle className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
+                  <AppIcon name="circle-check" className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
                   <span>{objective}</span>
                 </li>
               ))}
@@ -79,7 +79,7 @@ export function CourseDetails() {
                     {[1, 2, 3].map(lesson => (
                       <div key={lesson} className="flex items-center justify-between text-sm py-2 px-3 hover:bg-slate-50 rounded-md">
                         <div className="flex items-center space-x-3 text-slate-700">
-                          <Play className="w-4 h-4 text-slate-400" />
+                          <AppIcon name="play" className="w-4 h-4 text-slate-400" />
                           <span>Lesson {lesson}: Topic breakdown and analysis</span>
                         </div>
                         <span className="text-slate-500 text-xs">15:00</span>
@@ -124,7 +124,7 @@ export function CourseDetails() {
               <h3 className="font-bold text-slate-900">This course includes:</h3>
               <ul className="space-y-3 text-sm text-slate-600">
                 <li className="flex items-center space-x-3">
-                  <Play className="w-4 h-4 text-slate-400" />
+                  <AppIcon name="play" className="w-4 h-4 text-slate-400" />
                   <span>{course.duration_minutes / 60} hours on-demand video</span>
                 </li>
                 <li className="flex items-center space-x-3">

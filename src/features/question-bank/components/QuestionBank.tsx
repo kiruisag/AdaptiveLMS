@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Filter, Plus, Edit2, Trash2, Copy, FileQuestion } from 'lucide-react';
+import { AppIcon } from '../../../components/ui/AppIcon';
 
 const mockQuestions = [
   { id: '1', text: 'Which of the following is NOT a supervised learning algorithm?', type: 'multiple_choice', topic: 'Machine Learning Basics', difficulty: 'beginner' },
@@ -21,11 +21,11 @@ export function QuestionBank() {
         </div>
         <div className="flex gap-2">
            <button className="py-2 px-4 border border-slate-300 rounded-md shadow-sm text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 flex items-center gap-2">
-             <Filter className="w-4 h-4" />
+             <AppIcon name="filter" className="w-4 h-4" />
              <span>Filters</span>
            </button>
            <button className="py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 flex items-center gap-2">
-             <Plus className="w-4 h-4" />
+             <AppIcon name="plus" className="w-4 h-4" />
              <span>Create Question</span>
            </button>
         </div>
@@ -34,7 +34,7 @@ export function QuestionBank() {
       <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden flex flex-col">
         <div className="p-4 border-b border-slate-200 bg-slate-50 flex items-center gap-4">
            <div className="relative flex-1 max-w-md">
-             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+             <AppIcon name="magnifying-glass" className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
              <input 
                type="text" 
                placeholder="Search questions by text or topic..." 
@@ -61,7 +61,7 @@ export function QuestionBank() {
                 <tr key={question.id} className="hover:bg-slate-50">
                   <td className="px-6 py-4">
                     <div className="flex items-start space-x-3">
-                       <FileQuestion className="w-5 h-5 text-slate-400 shrink-0 mt-0.5" />
+                       <AppIcon name="file-circle-question" className="w-5 h-5 text-slate-400 shrink-0 mt-0.5" />
                        <p className="text-sm font-medium text-slate-900 line-clamp-2">{question.text}</p>
                     </div>
                   </td>
@@ -83,9 +83,9 @@ export function QuestionBank() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex items-center justify-end space-x-2">
-                       <button className="text-slate-400 hover:text-indigo-600 transition-colors p-1"><Edit2 className="w-4 h-4" /></button>
-                       <button className="text-slate-400 hover:text-indigo-600 transition-colors p-1"><Copy className="w-4 h-4" /></button>
-                       <button className="text-slate-400 hover:text-red-600 transition-colors p-1"><Trash2 className="w-4 h-4" /></button>
+                       <button className="text-slate-400 hover:text-indigo-600 transition-colors p-1"><AppIcon name="pen" className="w-4 h-4" /></button>
+                       <button className="text-slate-400 hover:text-indigo-600 transition-colors p-1"><AppIcon name="copy" className="w-4 h-4" /></button>
+                       <button className="text-slate-400 hover:text-red-600 transition-colors p-1"><AppIcon name="trash" className="w-4 h-4" /></button>
                     </div>
                   </td>
                 </tr>

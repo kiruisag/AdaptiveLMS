@@ -1,5 +1,5 @@
 import React from 'react';
-import { Users, BookOpen, AlertTriangle, Activity } from 'lucide-react';
+import { AppIcon } from '../../../components/ui/AppIcon';
 import { Link } from 'react-router-dom';
 
 export function InstructorDashboard() {
@@ -20,7 +20,7 @@ export function InstructorDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200 flex items-center space-x-4">
           <div className="bg-indigo-100 p-3 rounded-full">
-            <BookOpen className="w-6 h-6 text-indigo-600" />
+            <AppIcon name="book-open" className="w-6 h-6 text-indigo-600" />
           </div>
           <div>
             <p className="text-sm font-medium text-slate-500">Active Courses</p>
@@ -30,7 +30,7 @@ export function InstructorDashboard() {
         
         <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200 flex items-center space-x-4">
           <div className="bg-green-100 p-3 rounded-full">
-            <Users className="w-6 h-6 text-green-600" />
+            <AppIcon name="users" className="w-6 h-6 text-green-600" />
           </div>
           <div>
             <p className="text-sm font-medium text-slate-500">Total Learners</p>
@@ -40,7 +40,7 @@ export function InstructorDashboard() {
         
         <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200 flex items-center space-x-4">
           <div className="bg-orange-100 p-3 rounded-full">
-            <AlertTriangle className="w-6 h-6 text-orange-600" />
+            <AppIcon name="triangle-exclamation" className="w-6 h-6 text-orange-600" />
           </div>
           <div>
             <p className="text-sm font-medium text-slate-500">At-Risk Learners</p>
@@ -50,7 +50,7 @@ export function InstructorDashboard() {
         
         <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200 flex items-center space-x-4">
           <div className="bg-blue-100 p-3 rounded-full">
-            <Activity className="w-6 h-6 text-blue-600" />
+            <AppIcon name="wave-square" className="w-6 h-6 text-blue-600" />
           </div>
           <div>
             <p className="text-sm font-medium text-slate-500">Avg. Completion</p>
@@ -74,7 +74,7 @@ export function InstructorDashboard() {
                <div key={course.id} className="flex items-center justify-between p-3 hover:bg-slate-50 rounded-lg border border-slate-100 transition-colors">
                   <div className="flex items-center space-x-3">
                      <div className="w-10 h-10 bg-slate-100 rounded flex items-center justify-center shrink-0">
-                        <BookOpen className="w-5 h-5 text-slate-400" />
+                        <AppIcon name="book-open" className="w-5 h-5 text-slate-400" />
                      </div>
                      <div>
                         <p className="font-semibold text-slate-900 text-sm">{course.title}</p>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAssessment, useSubmitAssessment } from '../hooks/useAssessments';
-import { Clock, AlertCircle, CheckCircle, ArrowLeft } from 'lucide-react';
+import { AppIcon } from '../../../components/ui/AppIcon';
 import { toast } from 'sonner';
 import { FullPageLoader } from '../../../components/ui/LoadingSpinner';
 
@@ -40,7 +40,7 @@ export function AssessmentPlayer() {
       <div className="max-w-2xl mx-auto space-y-6">
         <div className="text-center p-8 bg-white rounded-lg shadow-sm border border-slate-200">
            <div className={`mx-auto w-16 h-16 rounded-full flex items-center justify-center mb-4 ${result.passed ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
-             {result.passed ? <CheckCircle className="w-8 h-8" /> : <AlertCircle className="w-8 h-8" />}
+             {result.passed ? <AppIcon name="circle-check" className="w-8 h-8" /> : <AppIcon name="circle-exclamation" className="w-8 h-8" />}
            </div>
            <h2 className="text-2xl font-bold text-slate-900 mb-2">
              {result.passed ? 'Assessment Passed!' : 'Assessment Failed'}
@@ -65,11 +65,11 @@ export function AssessmentPlayer() {
     <div className="max-w-3xl mx-auto space-y-6 pb-20">
       <div className="flex items-center justify-between">
          <button onClick={() => navigate(-1)} className="text-slate-500 hover:text-slate-700 flex items-center space-x-1">
-           <ArrowLeft className="w-4 h-4" />
+           <AppIcon name="arrow-left" className="w-4 h-4" />
            <span className="text-sm font-medium">Back</span>
          </button>
          <div className="flex items-center space-x-2 text-slate-500 font-medium">
-           <Clock className="w-5 h-5" />
+           <AppIcon name="clock" className="w-5 h-5" />
            <span>{assessment.duration_minutes}:00 left</span>
          </div>
       </div>

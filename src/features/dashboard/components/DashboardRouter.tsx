@@ -5,11 +5,13 @@ import { AdminDashboard } from './AdminDashboard';
 import { InstructorDashboard } from '../../instructor/components/InstructorDashboard';
 
 export function DashboardRouter() {
-  const { user } = useAuthStore();
+  const { user, activeTenant } = useAuthStore();
 
   if (!user) return null;
 
-  switch (user.role) {
+  const currentRole = activeTenant?.role ?? user.role ?? 'learner';
+
+  switch (currentRole) {
     case 'learner':
       return <LearnerDashboard />;
     case 'instructor':

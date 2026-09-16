@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { LogOut, Settings, User as UserIcon, Moon, Sun } from 'lucide-react';
+import { AppIcon } from './AppIcon';
 import { useAuthStore } from '../../stores/auth.store';
 import { useUiStore } from '../../stores/ui.store';
 
@@ -61,7 +61,7 @@ export function UserMenu() {
               }}
               className="w-full text-left flex items-center px-3 py-2 text-sm text-slate-700 rounded-md hover:bg-slate-100 hover:text-slate-900 transition-colors"
             >
-              <UserIcon className="w-4 h-4 mr-2 text-slate-400" />
+              <AppIcon name="user" className="w-4 h-4 mr-2 text-slate-400" />
               <span>Profile</span>
             </button>
             <button
@@ -71,7 +71,7 @@ export function UserMenu() {
               }}
               className="w-full text-left flex items-center px-3 py-2 text-sm text-slate-700 rounded-md hover:bg-slate-100 hover:text-slate-900 transition-colors"
             >
-              <Settings className="w-4 h-4 mr-2 text-slate-400" />
+              <AppIcon name="gear" className="w-4 h-4 mr-2 text-slate-400" />
               <span>Settings</span>
             </button>
             <button
@@ -82,9 +82,9 @@ export function UserMenu() {
             >
               <div className="flex items-center">
                 {theme === 'dark' ? (
-                  <Moon className="w-4 h-4 mr-2 text-slate-400" />
+                  <AppIcon name="moon" className="w-4 h-4 mr-2 text-slate-400" />
                 ) : (
-                  <Sun className="w-4 h-4 mr-2 text-slate-400" />
+                  <AppIcon name="sun" className="w-4 h-4 mr-2 text-slate-400" />
                 )}
                 <span>{theme === 'dark' ? 'Dark Mode' : 'Light Mode'}</span>
               </div>
@@ -102,7 +102,7 @@ export function UserMenu() {
               }}
               className="w-full text-left flex items-center px-3 py-2 text-sm text-red-600 rounded-md hover:bg-red-50 transition-colors"
             >
-              <LogOut className="w-4 h-4 mr-2 text-red-500" />
+              <AppIcon name="right-from-bracket" className="w-4 h-4 mr-2 text-red-500" />
               <span>Sign Out</span>
             </button>
           </div>

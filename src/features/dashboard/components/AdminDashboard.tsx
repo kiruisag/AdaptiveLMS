@@ -1,5 +1,5 @@
 import React from 'react';
-import { Users, Building2, Cpu, Database, CreditCard, TrendingUp, Activity } from 'lucide-react';
+import { AppIcon } from '../../../components/ui/AppIcon';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const revenueData = [
@@ -36,11 +36,11 @@ export function AdminDashboard() {
               <h3 className="text-2xl font-bold text-slate-900 mt-1">24,592</h3>
             </div>
             <div className="p-2 bg-indigo-50 rounded-lg">
-              <Users className="w-5 h-5 text-indigo-600" />
+              <AppIcon name="users" className="w-5 h-5 text-indigo-600" />
             </div>
           </div>
           <p className="text-sm text-green-600 mt-4 flex items-center font-medium">
-            <TrendingUp className="w-4 h-4 mr-1" /> +12% this month
+            <AppIcon name="arrow-trend-up" className="w-4 h-4 mr-1" /> +12% this month
           </p>
         </div>
 
@@ -51,11 +51,11 @@ export function AdminDashboard() {
               <h3 className="text-2xl font-bold text-slate-900 mt-1">148</h3>
             </div>
             <div className="p-2 bg-blue-50 rounded-lg">
-              <Building2 className="w-5 h-5 text-blue-600" />
+              <AppIcon name="building" className="w-5 h-5 text-blue-600" />
             </div>
           </div>
           <p className="text-sm text-green-600 mt-4 flex items-center font-medium">
-            <TrendingUp className="w-4 h-4 mr-1" /> +5 this week
+            <AppIcon name="arrow-trend-up" className="w-4 h-4 mr-1" /> +5 this week
           </p>
         </div>
 
@@ -66,11 +66,11 @@ export function AdminDashboard() {
               <h3 className="text-2xl font-bold text-slate-900 mt-1">$45,200</h3>
             </div>
             <div className="p-2 bg-emerald-50 rounded-lg">
-              <CreditCard className="w-5 h-5 text-emerald-600" />
+              <AppIcon name="credit-card" className="w-5 h-5 text-emerald-600" />
             </div>
           </div>
           <p className="text-sm text-green-600 mt-4 flex items-center font-medium">
-            <TrendingUp className="w-4 h-4 mr-1" /> +8.4% this month
+            <AppIcon name="arrow-trend-up" className="w-4 h-4 mr-1" /> +8.4% this month
           </p>
         </div>
 
@@ -81,11 +81,11 @@ export function AdminDashboard() {
               <h3 className="text-2xl font-bold text-slate-900 mt-1">1.2M</h3>
             </div>
             <div className="p-2 bg-purple-50 rounded-lg">
-              <Cpu className="w-5 h-5 text-purple-600" />
+              <AppIcon name="microchip" className="w-5 h-5 text-purple-600" />
             </div>
           </div>
           <p className="text-sm text-green-600 mt-4 flex items-center font-medium">
-            <TrendingUp className="w-4 h-4 mr-1" /> +24% this month
+            <AppIcon name="arrow-trend-up" className="w-4 h-4 mr-1" /> +24% this month
           </p>
         </div>
       </div>
@@ -116,16 +116,16 @@ export function AdminDashboard() {
           <h3 className="text-lg font-bold text-slate-900 mb-4">Infrastructure & AI Health</h3>
           <div className="space-y-3 flex-1">
             {[
-              { name: 'Core API Services', status: 'Healthy', uptime: '99.99%', icon: Activity, color: 'text-green-500' },
-              { name: 'Real-time WebSockets', status: 'Healthy', uptime: '99.98%', icon: Activity, color: 'text-green-500' },
-              { name: 'Primary Database', status: 'Healthy', uptime: '100%', icon: Database, color: 'text-green-500' },
-              { name: 'RAG Vector Store', status: 'Degraded (High Load)', uptime: '98.50%', icon: Cpu, color: 'text-orange-500' },
-              { name: 'Video CDN', status: 'Healthy', uptime: '99.99%', icon: Activity, color: 'text-green-500' },
-              { name: 'Assessment Engine', status: 'Healthy', uptime: '100%', icon: Activity, color: 'text-green-500' },
+              { name: 'Core API Services', status: 'Healthy', uptime: '99.99%', icon: 'wave-square', color: 'text-green-500' },
+              { name: 'Real-time WebSockets', status: 'Healthy', uptime: '99.98%', icon: 'signal', color: 'text-green-500' },
+              { name: 'Primary Database', status: 'Healthy', uptime: '100%', icon: 'database', color: 'text-green-500' },
+              { name: 'RAG Vector Store', status: 'Degraded (High Load)', uptime: '98.50%', icon: 'microchip', color: 'text-orange-500' },
+              { name: 'Video CDN', status: 'Healthy', uptime: '99.99%', icon: 'play-circle', color: 'text-green-500' },
+              { name: 'Assessment Engine', status: 'Healthy', uptime: '100%', icon: 'clipboard-check', color: 'text-green-500' },
             ].map((sys, idx) => (
               <div key={idx} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
                 <div className="flex items-center space-x-3">
-                  <sys.icon className={`w-4 h-4 ${sys.color}`} />
+                  <AppIcon name={sys.icon as string} className={`w-4 h-4 ${sys.color}`} />
                   <div>
                     <p className="text-sm font-semibold text-slate-900">{sys.name}</p>
                     <p className="text-xs text-slate-500">{sys.status} • {sys.uptime}</p>

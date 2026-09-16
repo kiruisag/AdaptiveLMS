@@ -1,10 +1,12 @@
 import axios from 'axios';
 
+const API_BASE_URL = (import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env?.VITE_API_URL || '/api/v1';
+
 export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api/v1',
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
-    'Accept': 'application/json',
+    Accept: 'application/json',
   },
   withCredentials: true,
 });
@@ -14,12 +16,12 @@ apiClient.interceptors.request.use((config) => {
   if (token && config.headers) {
     config.headers.Authorization = `Bearer ${token}`;
   }
-  
+
   const activeTenantId = localStorage.getItem('active_tenant_id');
   if (activeTenantId && config.headers) {
     config.headers['X-Tenant-ID'] = activeTenantId;
   }
-  
+
   return config;
 });
 
@@ -28,7 +30,7 @@ apiClient.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('access_token');
-      // Using custom event to avoid circular dependencies with stores
+      localStorage.removeItem('active_tenant_id');
       window.dispatchEvent(new Event('auth:unauthorized'));
     }
     return Promise.reject(error);

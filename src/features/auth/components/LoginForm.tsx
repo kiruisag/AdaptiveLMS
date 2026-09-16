@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useAuthStore } from '../../../stores/auth.store';
 import { useNavigate, Link } from 'react-router-dom';
-import { Eye, EyeOff, Loader2, BookOpen } from 'lucide-react';
+import { AppIcon } from '../../../components/ui/AppIcon';
 import { authApi } from '../../../services/api/auth.api';
 import { toast } from 'sonner';
 
@@ -30,21 +30,22 @@ export function LoginForm() {
     setServerError(null);
     try {
       const response = await authApi.login(data);
-      
+
       if (response.user.tenants && response.user.tenants.length > 1) {
-        // Cache token but don't set auth yet, need tenant
         localStorage.setItem('temp_access_token', response.token);
         localStorage.setItem('temp_user', JSON.stringify(response.user));
         navigate('/auth/select-organization');
-      } else if (response.user.tenants && response.user.tenants.length === 1) {
-        setActiveTenant(response.user.tenants[0]);
-        setAuth(response.user, response.token);
-        navigate('/');
-      } else {
-        setAuth(response.user, response.token);
-        navigate('/');
+        return;
       }
-    } catch (error: any) {
+
+      setAuth(response.user, response.token);
+
+      if (response.user.tenants?.[0]) {
+        setActiveTenant(response.user.tenants[0]);
+      }
+
+      navigate('/');
+    } catch (error: unknown) {
       setServerError('We couldn\'t sign you in with those details. Please check your email and password and try again.');
     }
   };
@@ -52,7 +53,7 @@ export function LoginForm() {
   return (
     <div className="w-full">
       <div className="mb-10 hidden lg:block">
-        <BookOpen className="w-10 h-10 text-indigo-600 mb-6" />
+        <AppIcon name="book-open" className="w-10 h-10 text-indigo-600 mb-6" />
         <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">Welcome back</h2>
         <p className="mt-2 text-slate-500 text-sm">Sign in to continue your personalized learning journey.</p>
       </div>
@@ -90,7 +91,7 @@ export function LoginForm() {
               className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600"
               onClick={() => setShowPassword(!showPassword)}
             >
-              {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+              {showPassword ? <AppIcon name="eye-slash" className="h-5 w-5" /> : <AppIcon name="eye" className="h-5 w-5" />}
             </button>
           </div>
           {errors.password && <p className="mt-2 text-sm text-red-600">{errors.password.message}</p>}
@@ -130,7 +131,7 @@ export function LoginForm() {
           >
             {isSubmitting ? (
               <span className="flex items-center">
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                <AppIcon name="spinner" className="w-4 h-4 mr-2 animate-spin" />
                 Signing in...
               </span>
             ) : (
@@ -153,7 +154,18 @@ export function LoginForm() {
         <div className="mt-8">
           <button
             type="button"
-            onClick={() => toast.info('Google authentication flow initialized via API.')}
+            onClick={async () => {
+              try {
+                const response = await authApi.loginWithGoogle();
+                setAuth(response.user, response.token);
+                if (response.user.tenants?.[0]) {
+                  setActiveTenant(response.user.tenants[0]);
+                }
+                navigate('/');
+              } catch (error) {
+                toast.error('Google sign-in is unavailable right now. Please try again.');
+              }
+            }}
             className="w-full flex justify-center items-center py-3 px-4 border border-slate-300 rounded-xl shadow-sm bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
           >
             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">

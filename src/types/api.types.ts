@@ -1,3 +1,9 @@
+export type UserRole =
+  | 'learner'
+  | 'instructor'
+  | 'org_admin'
+  | 'sys_admin';
+
 export interface ApiError {
   message: string;
   code?: string;
@@ -16,13 +22,21 @@ export interface PaginatedResponse<T> {
   };
 }
 
+export interface TenantMembershipDTO {
+  id?: string;
+  tenant_id?: string;
+  role: UserRole;
+  permissions?: string[];
+}
+
 export interface TenantDTO {
   id: string;
   name: string;
   slug: string;
   type: string;
   logo_url?: string;
-  role: "learner" | "instructor" | "org_admin" | "sys_admin";
+  role: UserRole;
+  membership?: TenantMembershipDTO;
 }
 
 export interface UserDTO {
@@ -33,6 +47,6 @@ export interface UserDTO {
   created_at: string;
   updated_at: string;
   tenants: TenantDTO[];
-  // For backwards compatibility in UI until fully migrated:
-  role?: "learner" | "instructor" | "org_admin" | "sys_admin";
+  role?: UserRole;
+  membership?: TenantMembershipDTO;
 }
