@@ -1,4 +1,5 @@
 import axios, { AxiosError } from 'axios';
+import { useUiStore } from '../stores/ui.store';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
 
@@ -13,18 +14,28 @@ export const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
   (config) => {
+    // Show global loading spinner
+    useUiStore.getState().showGlobalLoader();
+    
     const token = localStorage.getItem('access_token');
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    useUiStore.getState().hideGlobalLoader();
+    return Promise.reject(error);
+  }
 );
 
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    useUiStore.getState().hideGlobalLoader();
+    return response;
+  },
   async (error: AxiosError) => {
+    useUiStore.getState().hideGlobalLoader();
     const originalRequest = error.config;
     
     // Handle 401 Unauthorized

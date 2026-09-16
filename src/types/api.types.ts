@@ -16,13 +16,23 @@ export interface PaginatedResponse<T> {
   };
 }
 
+export interface TenantDTO {
+  id: string;
+  name: string;
+  slug: string;
+  type: string;
+  logo_url?: string;
+  role: "learner" | "instructor" | "org_admin" | "sys_admin";
+}
+
 export interface UserDTO {
   id: string;
   name: string;
   email: string;
-  role: "learner" | "instructor" | "org_admin" | "sys_admin";
-  organization_id?: string;
   avatar_url?: string;
   created_at: string;
   updated_at: string;
+  tenants: TenantDTO[];
+  // For backwards compatibility in UI until fully migrated:
+  role?: "learner" | "instructor" | "org_admin" | "sys_admin";
 }

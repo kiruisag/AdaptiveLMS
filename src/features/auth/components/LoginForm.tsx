@@ -3,100 +3,194 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useAuthStore } from '../../../stores/auth.store';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { Eye, EyeOff, Loader2, BookOpen } from 'lucide-react';
+import { authApi } from '../../../services/api/auth.api';
 import { toast } from 'sonner';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  password: z.string().min(1, 'Password is required'),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
+  const [showPassword, setShowPassword] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
+  
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
   });
-  const { setAuth } = useAuthStore();
+  
+  const { setAuth, setActiveTenant } = useAuthStore();
   const navigate = useNavigate();
-  const [serverError, setServerError] = useState<string | null>(null);
 
   const onSubmit = async (data: LoginFormValues) => {
     setServerError(null);
     try {
-      // Mock API call
-      // const response = await apiClient.post('/auth/login', data);
-      // setAuth(response.data.user, response.data.token);
+      const response = await authApi.login(data);
       
-      // Simulate network request
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      if (data.email === 'admin@example.com' || data.email === 'learner@example.com') {
-         setAuth({
-            id: '1',
-            name: 'Test User',
-            email: data.email,
-            role: data.email.includes('admin') ? 'sys_admin' : 'learner',
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-         }, 'mock-jwt-token-123');
-         toast.success('Logged in successfully');
-         navigate('/');
+      if (response.user.tenants && response.user.tenants.length > 1) {
+        // Cache token but don't set auth yet, need tenant
+        localStorage.setItem('temp_access_token', response.token);
+        localStorage.setItem('temp_user', JSON.stringify(response.user));
+        navigate('/auth/select-organization');
+      } else if (response.user.tenants && response.user.tenants.length === 1) {
+        setActiveTenant(response.user.tenants[0]);
+        setAuth(response.user, response.token);
+        navigate('/');
       } else {
-         throw new Error('Invalid credentials');
+        setAuth(response.user, response.token);
+        navigate('/');
       }
     } catch (error: any) {
-      setServerError(error.response?.data?.message || error.message || 'An error occurred during login');
+      setServerError('We couldn\'t sign you in with those details. Please check your email and password and try again.');
     }
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      <div>
-        <label className="block text-sm font-medium text-slate-700">Email address</label>
-        <div className="mt-1">
+    <div className="w-full">
+      <div className="mb-10 hidden lg:block">
+        <BookOpen className="w-10 h-10 text-indigo-600 mb-6" />
+        <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">Welcome back</h2>
+        <p className="mt-2 text-slate-500 text-sm">Sign in to continue your personalized learning journey.</p>
+      </div>
+
+      <div className="mb-10 lg:hidden">
+        <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">Welcome back</h2>
+        <p className="mt-2 text-slate-500 text-sm">Sign in to continue your personalized learning journey.</p>
+      </div>
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1.5">Email address</label>
           <input
             {...register('email')}
             type="email"
             autoComplete="email"
-            className="appearance-none block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            placeholder="you@example.com"
+            className="appearance-none block w-full px-4 py-3 border border-slate-300 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-shadow"
           />
           {errors.email && <p className="mt-2 text-sm text-red-600">{errors.email.message}</p>}
         </div>
-      </div>
 
-      <div>
-        <label className="block text-sm font-medium text-slate-700">Password</label>
-        <div className="mt-1">
-          <input
-            {...register('password')}
-            type="password"
-            autoComplete="current-password"
-            className="appearance-none block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          />
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1.5">Password</label>
+          <div className="relative">
+            <input
+              {...register('password')}
+              type={showPassword ? "text" : "password"}
+              autoComplete="current-password"
+              placeholder="Enter your password"
+              className="appearance-none block w-full px-4 py-3 border border-slate-300 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-shadow pr-12"
+            />
+            <button
+              type="button"
+              className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+            </button>
+          </div>
           {errors.password && <p className="mt-2 text-sm text-red-600">{errors.password.message}</p>}
         </div>
-      </div>
 
-      {serverError && (
-        <div className="text-sm text-red-600 bg-red-50 p-3 rounded border border-red-200">
-          {serverError}
+        <div className="flex items-center justify-between pt-1">
+          <div className="flex items-center">
+            <input
+              id="remember-me"
+              name="remember-me"
+              type="checkbox"
+              className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-slate-300 rounded"
+            />
+            <label htmlFor="remember-me" className="ml-2 block text-sm text-slate-700">
+              Remember me
+            </label>
+          </div>
+
+          <div className="text-sm">
+            <Link to="/auth/forgot-password" className="font-medium text-indigo-600 hover:text-indigo-500">
+              Forgot password?
+            </Link>
+          </div>
         </div>
-      )}
 
-      <div>
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-        >
-          {isSubmitting ? 'Signing in...' : 'Sign in'}
-        </button>
+        {serverError && (
+          <div className="text-sm text-red-600 bg-red-50 p-4 rounded-xl border border-red-100 flex items-start">
+            <div className="flex-1">{serverError}</div>
+          </div>
+        )}
+
+        <div className="pt-2">
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-70 transition-colors"
+          >
+            {isSubmitting ? (
+              <span className="flex items-center">
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Signing in...
+              </span>
+            ) : (
+              'Sign in'
+            )}
+          </button>
+        </div>
+      </form>
+
+      <div className="mt-8">
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-slate-200" />
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-3 bg-white text-slate-500 font-medium">OR</span>
+          </div>
+        </div>
+
+        <div className="mt-8">
+          <button
+            type="button"
+            onClick={() => toast.info('Google authentication flow initialized via API.')}
+            className="w-full flex justify-center items-center py-3 px-4 border border-slate-300 rounded-xl shadow-sm bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+          >
+            <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
+              <path
+                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                fill="#4285F4"
+              />
+              <path
+                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                fill="#34A853"
+              />
+              <path
+                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                fill="#FBBC05"
+              />
+              <path
+                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                fill="#EA4335"
+              />
+            </svg>
+            Continue with Google
+          </button>
+        </div>
       </div>
-      
-      <div className="text-sm text-center text-slate-500 mt-4">
-        Try <span className="font-semibold text-slate-700">learner@example.com</span> / <span className="font-semibold text-slate-700">password</span>
+
+      <div className="mt-10 text-center text-sm text-slate-600">
+        New to Adaptive LMS?{' '}
+        <Link to="/auth/register" className="font-semibold text-indigo-600 hover:text-indigo-500">
+          Create an organization
+        </Link>
       </div>
-    </form>
+
+      <div className="mt-8 p-4 bg-slate-50 rounded-xl border border-slate-100 text-xs text-slate-500 space-y-1">
+        <p className="font-semibold text-slate-700 mb-2">Demo Accounts:</p>
+        <p>Admin: admin@example.com / password</p>
+        <p>Learner: learner@example.com / password</p>
+      </div>
+    </div>
   );
 }

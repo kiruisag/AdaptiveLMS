@@ -1,6 +1,7 @@
 import React, { ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
+import { TenantProvider } from './TenantProvider';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -15,8 +16,10 @@ const queryClient = new QueryClient({
 export function AppProvider({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
-      {children}
-      <Toaster position="top-right" />
+      <TenantProvider>
+        {children}
+        <Toaster position="top-right" />
+      </TenantProvider>
     </QueryClientProvider>
   );
 }

@@ -1,11 +1,18 @@
 import React from 'react';
 import { Outlet, Link } from 'react-router-dom';
-import { useAuthStore } from '../../stores/auth.store';
-import { BookOpen, LogOut, LayoutDashboard, Settings } from 'lucide-react';
+import { useAuth } from '../../stores/auth.store';
+import { 
+  BookOpen, LogOut, LayoutDashboard, Settings, Users, Building2, ShieldAlert,
+  Bot, TrendingUp, CheckSquare, Award, BookMarked, FileQuestion, PieChart, CreditCard, Activity
+} from 'lucide-react';
+import { Breadcrumbs } from '../../components/ui/Breadcrumbs';
+import { GlobalSearch } from '../../components/ui/GlobalSearch';
+import { NotificationBell } from '../../components/ui/NotificationBell';
+import { UserMenu } from '../../components/ui/UserMenu';
 
 export function AppLayout() {
-  const { user, logout } = useAuthStore();
-
+  const { user, logout } = useAuth();
+  
   return (
     <div className="absolute inset-0 bg-slate-50 flex flex-col md:flex-row">
       {/* Sidebar */}
@@ -15,30 +22,88 @@ export function AppLayout() {
           <span className="text-xl font-bold">AdaptiveLMS</span>
         </div>
         
-        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           <Link to="/" className="flex items-center space-x-3 p-2 rounded hover:bg-slate-800 transition-colors">
             <LayoutDashboard className="w-5 h-5 text-slate-400" />
             <span>Dashboard</span>
           </Link>
+          
+          <div className="pt-4 pb-2">
+            <p className="px-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">Learning</p>
+          </div>
           <Link to="/courses" className="flex items-center space-x-3 p-2 rounded hover:bg-slate-800 transition-colors">
             <BookOpen className="w-5 h-5 text-slate-400" />
             <span>Courses</span>
           </Link>
           <Link to="/ai-tutor" className="flex items-center space-x-3 p-2 rounded hover:bg-slate-800 transition-colors">
-            <svg className="w-5 h-5 text-slate-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            <Bot className="w-5 h-5 text-slate-400" />
             <span>AI Tutor</span>
           </Link>
-          <div className="pt-4 pb-2">
-            <p className="px-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">Performance</p>
-          </div>
+          <Link to="/progress" className="flex items-center space-x-3 p-2 rounded hover:bg-slate-800 transition-colors">
+            <TrendingUp className="w-5 h-5 text-slate-400" />
+            <span>My Progress</span>
+          </Link>
           <Link to="/assessments/a1/attempt" className="flex items-center space-x-3 p-2 rounded hover:bg-slate-800 transition-colors">
-            <svg className="w-5 h-5 text-slate-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <CheckSquare className="w-5 h-5 text-slate-400" />
             <span>Assessments</span>
           </Link>
-          <Link to="/progress" className="flex items-center space-x-3 p-2 rounded hover:bg-slate-800 transition-colors">
-            <svg className="w-5 h-5 text-slate-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
-            <span>Progress</span>
+          <Link to="/certificates" className="flex items-center space-x-3 p-2 rounded hover:bg-slate-800 transition-colors">
+            <Award className="w-5 h-5 text-slate-400" />
+            <span>Certificates</span>
           </Link>
+
+          {(user?.role === 'sys_admin' || user?.role === 'org_admin' || user?.role === 'instructor') && (
+            <>
+              <div className="pt-4 pb-2">
+                <p className="px-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">Teaching & Content</p>
+              </div>
+              <Link to="/instructor/courses" className="flex items-center space-x-3 p-2 rounded hover:bg-slate-800 transition-colors">
+                <BookMarked className="w-5 h-5 text-slate-400" />
+                <span>Course Management</span>
+              </Link>
+              <Link to="/instructor/question-bank" className="flex items-center space-x-3 p-2 rounded hover:bg-slate-800 transition-colors">
+                <FileQuestion className="w-5 h-5 text-slate-400" />
+                <span>Question Bank</span>
+              </Link>
+              <Link to="/instructor/analytics" className="flex items-center space-x-3 p-2 rounded hover:bg-slate-800 transition-colors">
+                <PieChart className="w-5 h-5 text-slate-400" />
+                <span>Instructor Analytics</span>
+              </Link>
+            </>
+          )}
+
+          {(user?.role === 'sys_admin' || user?.role === 'org_admin') && (
+            <>
+              <div className="pt-4 pb-2">
+                <p className="px-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">Administration</p>
+              </div>
+              <Link to="/admin/users" className="flex items-center space-x-3 p-2 rounded hover:bg-slate-800 transition-colors">
+                <Users className="w-5 h-5 text-slate-400" />
+                <span>Users & Roles</span>
+              </Link>
+              <Link to="/admin/organizations" className="flex items-center space-x-3 p-2 rounded hover:bg-slate-800 transition-colors">
+                <Building2 className="w-5 h-5 text-slate-400" />
+                <span>Organizations</span>
+              </Link>
+              <Link to="/admin/billing" className="flex items-center space-x-3 p-2 rounded hover:bg-slate-800 transition-colors">
+                <CreditCard className="w-5 h-5 text-slate-400" />
+                <span>Billing & Subscriptions</span>
+              </Link>
+
+              {user?.role === 'sys_admin' && (
+                <>
+                  <Link to="/admin/analytics" className="flex items-center space-x-3 p-2 rounded hover:bg-slate-800 transition-colors">
+                    <Activity className="w-5 h-5 text-slate-400" />
+                    <span>System Analytics</span>
+                  </Link>
+                  <Link to="/admin/audit-logs" className="flex items-center space-x-3 p-2 rounded hover:bg-slate-800 transition-colors">
+                    <ShieldAlert className="w-5 h-5 text-slate-400" />
+                    <span>Audit Logs</span>
+                  </Link>
+                </>
+              )}
+            </>
+          )}
         </nav>
 
         <div className="p-4 border-t border-slate-800">
@@ -62,18 +127,23 @@ export function AppLayout() {
       {/* Main Content */}
       <main className="flex-1 flex flex-col min-h-0 overflow-hidden">
         {/* Top Header for Mobile & Actions */}
-        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-8 shrink-0">
-          <div className="flex items-center md:hidden">
+        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-8 shrink-0 gap-4 z-50 relative">
+          <div className="flex items-center md:hidden shrink-0">
              <BookOpen className="w-6 h-6 text-indigo-600 mr-2" />
              <span className="font-bold text-slate-900">AdaptiveLMS</span>
           </div>
-          <div className="hidden md:block">
-            {/* Page title or breadcrumbs could go here */}
+          
+          <div className="hidden md:block overflow-hidden min-w-max mr-4">
+            <Breadcrumbs />
           </div>
-          <div className="flex items-center space-x-4">
-            <button className="text-slate-500 hover:text-slate-700">
-              <Settings className="w-5 h-5" />
-            </button>
+
+          <div className="flex-1 max-w-xl">
+            <GlobalSearch />
+          </div>
+
+          <div className="flex items-center space-x-4 shrink-0">
+            <NotificationBell />
+            <UserMenu />
           </div>
         </header>
 
