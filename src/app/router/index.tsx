@@ -7,6 +7,9 @@ import { LoginForm } from '../../features/auth/components/LoginForm';
 import { RegisterPage } from '../../features/auth/pages/RegisterPage';
 import { SelectOrganizationPage } from '../../features/auth/pages/SelectOrganizationPage';
 import { ForgotPasswordPage } from '../../features/auth/pages/ForgotPasswordPage';
+import { ResetPasswordPage } from '../../features/auth/pages/ResetPasswordPage';
+import { VerifyEmailPage } from '../../features/auth/pages/VerifyEmailPage';
+import { SessionsPage } from '../../features/auth/pages/SessionsPage';
 import { DashboardRouter } from '../../features/dashboard/components/DashboardRouter';
 import { CourseCatalog } from '../../features/courses/components/CourseCatalog';
 import { LearningPlayer } from '../../features/learning/components/LearningPlayer';
@@ -39,6 +42,14 @@ const router = createBrowserRouter([
       {
         path: 'forgot-password',
         element: <ForgotPasswordPage />,
+      },
+      {
+        path: 'reset-password',
+        element: <ResetPasswordPage />,
+      },
+      {
+        path: 'verify-email',
+        element: <VerifyEmailPage />,
       },
       {
         path: '',
@@ -77,6 +88,14 @@ const router = createBrowserRouter([
       {
         path: 'ai-tutor',
         element: <AITutor />
+      },
+      {
+        path: 'profile',
+        element: <SessionsPage />
+      },
+      {
+        path: 'security/sessions',
+        element: <SessionsPage />
       },
       {
         path: 'instructor/question-bank',

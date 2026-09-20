@@ -128,11 +128,11 @@ export function CourseDetails() {
                   <span>{course.duration_minutes / 60} hours on-demand video</span>
                 </li>
                 <li className="flex items-center space-x-3">
-                  <BookOpen className="w-4 h-4 text-slate-400" />
+                  <AppIcon name="book-open" className="w-4 h-4 text-slate-400" />
                   <span>12 downloadable resources</span>
                 </li>
                 <li className="flex items-center space-x-3">
-                  <CheckCircle className="w-4 h-4 text-slate-400" />
+                  <AppIcon name="circle-check" className="w-4 h-4 text-slate-400" />
                   <span>Certificate of completion</span>
                 </li>
               </ul>

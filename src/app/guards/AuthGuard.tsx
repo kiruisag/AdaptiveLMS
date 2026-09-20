@@ -4,7 +4,7 @@ import { useAuthStore } from '../../stores/auth.store';
 import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isLoading, activeTenant, checkAuth } = useAuthStore();
+  const { isAuthenticated, isLoading, activeTenant, user, checkAuth } = useAuthStore();
   const location = useLocation();
 
   useEffect(() => {
@@ -15,11 +15,14 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     return <div className="flex h-screen items-center justify-center"><LoadingSpinner size="lg" text="Authenticating..." /></div>;
   }
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated || !user) {
     return <Navigate to="/auth/login" state={{ from: location }} replace />;
   }
 
-  if (!activeTenant && location.pathname !== '/auth/select-organization') {
+  const hasMultiTenantSelection = Array.isArray(user.tenants) && user.tenants.length > 1;
+  const requiresTenantSelection = hasMultiTenantSelection && !activeTenant && location.pathname !== '/auth/select-organization';
+
+  if (requiresTenantSelection) {
     return <Navigate to="/auth/select-organization" replace />;
   }
 

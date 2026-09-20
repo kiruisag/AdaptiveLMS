@@ -32,7 +32,18 @@ export function RegisterPage() {
   const onSubmit = async (data: RegisterFormValues) => {
     setServerError(null);
     try {
-      await authApi.registerOrganization(data);
+      const [first_name, ...rest] = data.name.trim().split(/\s+/);
+      const last_name = rest.join(' ') || 'User';
+
+      await authApi.register({
+        first_name,
+        last_name,
+        email: data.email,
+        phone: null,
+        password: data.password,
+        password_confirmation: data.confirmPassword,
+      });
+
       navigate('/auth/login?registered=true');
     } catch (error: any) {
       setServerError('An error occurred during registration. Please try again.');

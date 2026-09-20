@@ -30,15 +30,20 @@ export function LoginForm() {
     setServerError(null);
     try {
       const response = await authApi.login(data);
+      const token = response.token ?? localStorage.getItem('access_token');
+
+      if (!token) {
+        throw new Error('Authentication token missing from backend response');
+      }
+
+      setAuth(response.user, token);
 
       if (response.user.tenants && response.user.tenants.length > 1) {
-        localStorage.setItem('temp_access_token', response.token);
+        localStorage.setItem('temp_access_token', token);
         localStorage.setItem('temp_user', JSON.stringify(response.user));
         navigate('/auth/select-organization');
         return;
       }
-
-      setAuth(response.user, response.token);
 
       if (response.user.tenants?.[0]) {
         setActiveTenant(response.user.tenants[0]);
@@ -46,7 +51,8 @@ export function LoginForm() {
 
       navigate('/');
     } catch (error: unknown) {
-      setServerError('We couldn\'t sign you in with those details. Please check your email and password and try again.');
+      const message = error instanceof Error ? error.message : 'We couldn\'t sign you in with those details. Please check your email and password and try again.';
+      setServerError(message);
     }
   };
 

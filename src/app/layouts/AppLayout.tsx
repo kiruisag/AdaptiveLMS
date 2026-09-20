@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Outlet, Link } from 'react-router-dom';
 import { useAuth } from '../../stores/auth.store';
 import { AppIcon } from '../../components/ui/AppIcon';
@@ -8,8 +8,26 @@ import { NotificationBell } from '../../components/ui/NotificationBell';
 import { UserMenu } from '../../components/ui/UserMenu';
 
 export function AppLayout() {
-  const { user, activeTenant, logout } = useAuth();
+  const { user, activeTenant, logout, setActiveTenant } = useAuth();
+  const [showTenantMenu, setShowTenantMenu] = useState(false);
+  const tenantMenuRef = useRef<HTMLDivElement>(null);
   const currentRole = activeTenant?.role ?? user?.role;
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (tenantMenuRef.current && !tenantMenuRef.current.contains(event.target as Node)) {
+        setShowTenantMenu(false);
+      }
+    }
+
+    if (showTenantMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showTenantMenu]);
 
   return (
     <div className="absolute inset-0 bg-slate-50 flex flex-col md:flex-row">
@@ -140,6 +158,47 @@ export function AppLayout() {
           </div>
 
           <div className="flex items-center space-x-4 shrink-0">
+            {user?.tenants && user.tenants.length > 1 && (
+              <div className="relative" ref={tenantMenuRef}>
+                <button
+                  type="button"
+                  onClick={() => setShowTenantMenu((value) => !value)}
+                  className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors"
+                >
+                  <AppIcon name="building" className="w-4 h-4 text-indigo-600" />
+                  <span className="max-w-[140px] truncate">{activeTenant?.name ?? 'Select organization'}</span>
+                  <AppIcon name="chevron-down" className="w-4 h-4 text-slate-500" />
+                </button>
+
+                {showTenantMenu && (
+                  <div className="absolute right-0 mt-2 w-64 rounded-xl border border-slate-200 bg-white shadow-lg z-50 overflow-hidden">
+                    <div className="border-b border-slate-100 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                      Switch organization
+                    </div>
+                    <div className="max-h-64 overflow-y-auto">
+                      {user.tenants.map((tenant) => (
+                        <button
+                          key={tenant.id}
+                          type="button"
+                          onClick={() => {
+                            setActiveTenant(tenant);
+                            setShowTenantMenu(false);
+                          }}
+                          className={`flex w-full items-center justify-between px-3 py-2 text-left text-sm transition-colors ${
+                            activeTenant?.id === tenant.id
+                              ? 'bg-indigo-50 text-indigo-700'
+                              : 'text-slate-700 hover:bg-slate-50'
+                          }`}
+                        >
+                          <span className="truncate">{tenant.name}</span>
+                          {activeTenant?.id === tenant.id && <AppIcon name="check" className="w-4 h-4" />}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
             <NotificationBell />
             <UserMenu />
           </div>

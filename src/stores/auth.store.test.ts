@@ -49,6 +49,38 @@ test('fresh login establishes auth and avoids duplicate /me validations', async 
   }
 });
 
+test('missing auth token is treated as logged out without calling /me', async () => {
+  const store = useAuth.getState();
+  await store.logout();
+
+  const originalMe = authApi.me;
+  let meCalls = 0;
+  authApi.me = async () => {
+    meCalls += 1;
+    return {
+      id: 'u-1',
+      name: 'Alice',
+      email: 'alice@example.com',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      tenants: [],
+      role: 'learner',
+    } satisfies UserDTO;
+  };
+
+  try {
+    await store.checkAuth();
+
+    assert.equal(meCalls, 0);
+    assert.equal(store.isAuthenticated, false);
+    assert.equal(store.isLoading, false);
+    assert.equal(store.user, null);
+  } finally {
+    authApi.me = originalMe;
+    await store.logout();
+  }
+});
+
 test('tenant selection does not mutate the user identity', async () => {
   const store = useAuth.getState();
   await store.logout();

@@ -3,7 +3,9 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Link } from 'react-router-dom';
+import { toast } from 'sonner';
 import { AppIcon } from '../../../components/ui/AppIcon';
+import { authApi } from '../../../services/api/auth.api';
 
 const forgotPasswordSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -19,9 +21,14 @@ export function ForgotPasswordPage() {
   });
 
   const onSubmit = async (data: ForgotPasswordValues) => {
-    // MOCK API
-    await new Promise(resolve => setTimeout(resolve, 800));
-    setIsSubmitted(true);
+    try {
+      await authApi.forgotPassword({ email: data.email });
+      setIsSubmitted(true);
+      toast.success('If an account exists, a reset link has been sent.');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unable to send a reset link.';
+      toast.error(message);
+    }
   };
 
   return (

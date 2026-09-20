@@ -127,15 +127,33 @@ export const useAuth = create<AuthState>((set, get) => ({
       return;
     }
 
+    const token = getStorageItem(ACCESS_TOKEN_KEY);
+
+    if (!token) {
+      if (state.user || state.isAuthenticated || state.accessToken) {
+        removeStorageItem(ACTIVE_TENANT_KEY);
+        set({
+          user: null,
+          activeTenant: null,
+          accessToken: null,
+          isAuthenticated: false,
+          isLoading: false,
+        });
+      } else {
+        set({
+          isLoading: false,
+          isAuthenticated: false,
+          user: null,
+          activeTenant: null,
+          accessToken: null,
+        });
+      }
+      return;
+    }
+
     set({ isLoading: true });
 
     try {
-      const token = getStorageItem(ACCESS_TOKEN_KEY);
-
-      if (!token) {
-        throw new Error('No authentication token');
-      }
-
       const user = await authApi.me();
 
       if (!user) {
