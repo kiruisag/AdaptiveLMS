@@ -1,7 +1,7 @@
 import React, { ReactNode, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
-import { TenantProvider } from './TenantProvider';
+import { OrganizationProvider } from './OrganizationProvider';
 import { useAuthStore } from '../../stores/auth.store';
 
 const queryClient = new QueryClient({
@@ -27,11 +27,11 @@ function AuthBootstrap() {
 export function AppProvider({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
-      <TenantProvider>
+      <OrganizationProvider>
         <AuthBootstrap />
         {children}
         <Toaster position="top-right" />
-      </TenantProvider>
+      </OrganizationProvider>
     </QueryClientProvider>
   );
 }

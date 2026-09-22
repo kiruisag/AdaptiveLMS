@@ -60,7 +60,7 @@ export function GlobalSearch() {
     setQuery('');
   };
 
-  const isAdmin = user?.role === 'sys_admin' || user?.role === 'org_admin';
+  const isAdmin = false;
 
   return (
     <div className="relative w-full" ref={containerRef}>

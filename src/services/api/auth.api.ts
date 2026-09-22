@@ -1,5 +1,15 @@
 import { apiClient, normalizeApiError } from '../../api/client';
-import type { AuthApiResponse, UserDTO, RegisterPayload, ForgotPasswordPayload, ResetPasswordPayload, VerifyEmailPayload, SessionDTO } from '../../types/api.types';
+import type {
+  AuthApiResponse,
+  AuthUserDTO,
+  UserDTO,
+  RegisterPayload,
+  ForgotPasswordPayload,
+  ResetPasswordPayload,
+  VerifyEmailPayload,
+  SessionDTO,
+  OrganizationDTO,
+} from '../../types';
 
 const toUserDTO = (payload: Partial<UserDTO> | null | undefined): UserDTO => {
   const joinedName = [payload?.first_name, payload?.last_name].filter(Boolean).join(' ');
@@ -19,9 +29,65 @@ const toUserDTO = (payload: Partial<UserDTO> | null | undefined): UserDTO => {
     email_verified_at: payload?.email_verified_at ?? null,
     created_at: payload?.created_at ?? new Date().toISOString(),
     updated_at: payload?.updated_at ?? new Date().toISOString(),
-    tenants: Array.isArray(payload?.tenants) ? payload.tenants : [],
-    role: payload?.role ?? 'learner',
-    membership: payload?.membership,
+  };
+};
+
+export const toOrganizationDTO = (
+  payload: Partial<OrganizationDTO> | null | undefined,
+): OrganizationDTO | null => {
+  if (
+    !payload?.uuid ||
+    !payload.name ||
+    !payload.slug ||
+    !payload.status
+  ) {
+    return null;
+  }
+
+  return {
+    uuid: String(payload.uuid),
+    name: String(payload.name),
+    slug: String(payload.slug),
+    status: payload.status,
+    membership: payload.membership,
+    settings: payload.settings ?? null,
+    created_at: payload.created_at ?? null,
+    updated_at: payload.updated_at ?? null,
+  };
+};
+
+export const toAuthUserDTO = (
+  payload: Record<string, unknown> | null | undefined,
+): AuthUserDTO => {
+  const userPayload =
+    (payload?.user as Record<string, unknown> | undefined) ??
+    payload ??
+    {};
+
+  const user = toUserDTO(
+    userPayload as Partial<UserDTO>,
+  );
+
+  const organizations = Array.isArray(
+    userPayload.organizations,
+  )
+    ? userPayload.organizations
+        .map((organization) =>
+          toOrganizationDTO(
+            organization as Partial<OrganizationDTO>,
+          ),
+        )
+        .filter(
+          (
+            organization,
+          ): organization is OrganizationDTO =>
+            organization !== null,
+        )
+    : [];
+
+  return {
+    ...user,
+    organizations,
   };
 };
 
@@ -32,7 +98,7 @@ export const authApi = {
       const payload = data?.data ?? data;
 
       return {
-        user: toUserDTO(payload?.user ?? payload),
+        user: toAuthUserDTO(payload),
         token: payload?.token ?? null,
         token_type: payload?.token_type ?? 'Bearer',
         mfa_required: Boolean(payload?.mfa_required),
@@ -42,7 +108,24 @@ export const authApi = {
         message: data?.message ?? 'Login successful.',
       } satisfies AuthApiResponse;
     } catch (error) {
-      throw new Error(normalizeApiError(error).message);
+      throw normalizeApiError(error);
+    }
+  },
+
+  completeMfa: async (payload: { challenge_id: string; code: string }) => {
+    try {
+      const { data } = await apiClient.post('/auth/mfa/login', payload);
+      const body = data?.data ?? data;
+
+      return {
+        user: toAuthUserDTO(body),
+        token: body?.token ?? null,
+        token_type: body?.token_type ?? 'Bearer',
+        mfa_required: false,
+        message: data?.message ?? 'Login successful.',
+      } satisfies AuthApiResponse;
+    } catch (error) {
+      throw normalizeApiError(error);
     }
   },
 
@@ -50,9 +133,9 @@ export const authApi = {
     try {
       const { data } = await apiClient.get('/auth/me');
       const payload = data?.data ?? data;
-      return toUserDTO(payload);
+      return toAuthUserDTO(payload);
     } catch (error) {
-      throw new Error(normalizeApiError(error).message);
+      throw normalizeApiError(error);
     }
   },
 
@@ -61,7 +144,7 @@ export const authApi = {
       await apiClient.post('/auth/logout');
       return true;
     } catch (error) {
-      throw new Error(normalizeApiError(error).message);
+      throw normalizeApiError(error);
     }
   },
 
@@ -70,11 +153,11 @@ export const authApi = {
       const { data } = await apiClient.post('/auth/register', payload);
       const resource = data?.data ?? data;
       return {
-        user: toUserDTO(resource),
+        user: toAuthUserDTO(resource),
         message: data?.message ?? 'Registration successful.',
       };
     } catch (error) {
-      throw new Error(normalizeApiError(error).message);
+      throw normalizeApiError(error);
     }
   },
 
@@ -83,7 +166,7 @@ export const authApi = {
       await apiClient.post('/auth/forgot-password', payload);
       return true;
     } catch (error) {
-      throw new Error(normalizeApiError(error).message);
+      throw normalizeApiError(error);
     }
   },
 
@@ -92,11 +175,11 @@ export const authApi = {
       const { data } = await apiClient.post('/auth/reset-password', payload);
       const resource = data?.data ?? data;
       return {
-        user: toUserDTO(resource),
+        user: toAuthUserDTO(resource),
         message: data?.message ?? 'Password reset successfully.',
       };
     } catch (error) {
-      throw new Error(normalizeApiError(error).message);
+      throw normalizeApiError(error);
     }
   },
 
@@ -107,7 +190,7 @@ export const authApi = {
         message: data?.message ?? 'Email verified successfully.',
       };
     } catch (error) {
-      throw new Error(normalizeApiError(error).message);
+      throw normalizeApiError(error);
     }
   },
 
@@ -118,7 +201,7 @@ export const authApi = {
         message: data?.message ?? 'Verification email sent.',
       };
     } catch (error) {
-      throw new Error(normalizeApiError(error).message);
+      throw normalizeApiError(error);
     }
   },
 
@@ -127,7 +210,7 @@ export const authApi = {
       const { data } = await apiClient.get('/auth/sessions');
       return Array.isArray(data) ? data as SessionDTO[] : (data?.data ?? []) as SessionDTO[];
     } catch (error) {
-      throw new Error(normalizeApiError(error).message);
+      throw normalizeApiError(error);
     }
   },
 
@@ -136,7 +219,7 @@ export const authApi = {
       await apiClient.delete(`/auth/sessions/${sessionId}`);
       return true;
     } catch (error) {
-      throw new Error(normalizeApiError(error).message);
+      throw normalizeApiError(error);
     }
   },
 

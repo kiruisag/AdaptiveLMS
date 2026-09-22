@@ -4,12 +4,19 @@ import { LearnerDashboard } from './LearnerDashboard';
 import { AdminDashboard } from './AdminDashboard';
 import { InstructorDashboard } from '../../instructor/components/InstructorDashboard';
 
+import type { UserRole } from '../../../types';
 export function DashboardRouter() {
-  const { user, activeTenant } = useAuthStore();
+  const { user } = useAuthStore();
 
   if (!user) return null;
 
-  const currentRole = activeTenant?.role ?? user.role ?? 'learner';
+  // Role information will come from the authorization context.
+  // It is intentionally nullable until that contract is exposed by the backend.
+  const currentRole: UserRole | null = null;
+
+  if (!currentRole) {
+    return <LearnerDashboard />;
+  }
 
   switch (currentRole) {
     case 'learner':

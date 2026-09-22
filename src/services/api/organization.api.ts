@@ -1,114 +1,154 @@
 import { apiClient, normalizeApiError } from '../../api/client';
-import type { ApiEnvelope, PaginatedResponse, UserDTO, OrganizationDTO } from '../../types/api.types';
+import type { ApiEnvelope } from '../../types/api.types';
+import type {
+  InviteMemberPayload,
+  Organization,
+  OrganizationListResponse,
+  OrganizationMember,
+  OrganizationMembersResponse,
+  OrganizationPayload,
+} from '../../features/organization/types/organization.types';
 
-export interface OrganizationMemberDTO {
-  user_id: number;
-  organization_id: number;
-  status: 'INVITED' | 'ACTIVE' | 'SUSPENDED' | 'LEFT';
-  joined_at?: string | null;
-  invitation_expires_at?: string | null;
-  invitation_accepted_at?: string | null;
-  created_at?: string | null;
-  updated_at?: string | null;
-}
-
-export interface OrganizationPayload {
-  name: string;
-  slug: string;
-  settings?: Record<string, unknown> | null;
+function handleApiError(error: unknown): never {
+  throw new Error(normalizeApiError(error).message);
 }
 
 export const organizationApi = {
-  list: async (params?: Record<string, string | number>) => {
+  list: async (
+    params?: Record<string, string | number>,
+  ): Promise<OrganizationListResponse> => {
     try {
       const { data } = await apiClient.get('/organizations', { params });
-      return (data?.data ?? data) as PaginatedResponse<OrganizationDTO>;
+
+      return data as OrganizationListResponse;
     } catch (error) {
-      throw new Error(normalizeApiError(error).message);
+      return handleApiError(error);
     }
   },
 
-  get: async (organizationId: string) => {
+  get: async (organizationId: string): Promise<Organization> => {
     try {
-      const { data } = await apiClient.get(`/organizations/${organizationId}`);
-      return (data?.data ?? data) as OrganizationDTO;
+      const { data } = await apiClient.get(
+        `/organizations/${organizationId}`,
+      );
+
+      return (data?.data ?? data) as Organization;
     } catch (error) {
-      throw new Error(normalizeApiError(error).message);
+      return handleApiError(error);
     }
   },
 
-  create: async (payload: OrganizationPayload) => {
+  create: async (
+    payload: OrganizationPayload,
+  ): Promise<Organization> => {
     try {
       const { data } = await apiClient.post('/organizations', payload);
-      return (data?.data ?? data) as OrganizationDTO;
+
+      return (data?.data ?? data) as Organization;
     } catch (error) {
-      throw new Error(normalizeApiError(error).message);
+      return handleApiError(error);
     }
   },
 
-  update: async (organizationId: string, payload: Partial<OrganizationPayload>) => {
+  update: async (
+    organizationId: string,
+    payload: Partial<OrganizationPayload>,
+  ): Promise<Organization> => {
     try {
-      const { data } = await apiClient.patch(`/organizations/${organizationId}`, payload);
-      return (data?.data ?? data) as OrganizationDTO;
+      const { data } = await apiClient.patch(
+        `/organizations/${organizationId}`,
+        payload,
+      );
+
+      return (data?.data ?? data) as Organization;
     } catch (error) {
-      throw new Error(normalizeApiError(error).message);
+      return handleApiError(error);
     }
   },
 
-  activate: async (organizationId: string) => {
+  activate: async (organizationId: string): Promise<Organization> => {
     try {
-      const { data } = await apiClient.post(`/organizations/${organizationId}/activate`);
-      return (data?.data ?? data) as OrganizationDTO;
+      const { data } = await apiClient.post(
+        `/organizations/${organizationId}/activate`,
+      );
+
+      return (data?.data ?? data) as Organization;
     } catch (error) {
-      throw new Error(normalizeApiError(error).message);
+      return handleApiError(error);
     }
   },
 
-  suspend: async (organizationId: string) => {
+  suspend: async (organizationId: string): Promise<Organization> => {
     try {
-      const { data } = await apiClient.post(`/organizations/${organizationId}/suspend`);
-      return (data?.data ?? data) as OrganizationDTO;
+      const { data } = await apiClient.post(
+        `/organizations/${organizationId}/suspend`,
+      );
+
+      return (data?.data ?? data) as Organization;
     } catch (error) {
-      throw new Error(normalizeApiError(error).message);
+      return handleApiError(error);
     }
   },
 
-  restore: async (organizationId: string) => {
+  restore: async (organizationId: string): Promise<Organization> => {
     try {
-      const { data } = await apiClient.post(`/organizations/${organizationId}/restore`);
-      return (data?.data ?? data) as OrganizationDTO;
+      const { data } = await apiClient.post(
+        `/organizations/${organizationId}/restore`,
+      );
+
+      return (data?.data ?? data) as Organization;
     } catch (error) {
-      throw new Error(normalizeApiError(error).message);
+      return handleApiError(error);
     }
   },
 
-  remove: async (organizationId: string) => {
+  remove: async (organizationId: string): Promise<boolean> => {
     try {
       await apiClient.delete(`/organizations/${organizationId}`);
+
       return true;
     } catch (error) {
-      throw new Error(normalizeApiError(error).message);
+      return handleApiError(error);
     }
   },
 
-  getMembers: async (organizationId: string, params?: Record<string, string | number>) => {
+  getMembers: async (
+    organizationId: string,
+    params?: Record<string, string | number>,
+  ): Promise<OrganizationMembersResponse> => {
     try {
-      const { data } = await apiClient.get(`/organizations/${organizationId}/members`, { params });
-      return (data?.data ?? data) as PaginatedResponse<OrganizationMemberDTO>;
+      const { data } = await apiClient.get(
+        `/organizations/${organizationId}/members`,
+        { params },
+      );
+
+      return (data?.data ?? data) as OrganizationMembersResponse;
     } catch (error) {
-      throw new Error(normalizeApiError(error).message);
+      return handleApiError(error);
     }
   },
 
-  inviteMember: async (organizationId: string, payload: { user_id: number; metadata?: Record<string, unknown> | null }) => {
+  inviteMember: async (
+    organizationId: string,
+    payload: InviteMemberPayload,
+  ): Promise<
+    ApiEnvelope<{
+      membership: OrganizationMember;
+      invitation_token: string;
+    }>
+  > => {
     try {
-      const { data } = await apiClient.post(`/organizations/${organizationId}/members/invitations`, payload);
+      const { data } = await apiClient.post(
+        `/organizations/${organizationId}/members/invitations`,
+        payload,
+      );
+
       return (data?.data ?? data) as ApiEnvelope<{
-        membership: OrganizationMemberDTO;
+        membership: OrganizationMember;
         invitation_token: string;
       }>;
     } catch (error) {
-      throw new Error(normalizeApiError(error).message);
+      return handleApiError(error);
     }
   },
 };

@@ -1,91 +1,111 @@
-import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../stores/auth.store';
-import { useTenant } from '../../../app/providers/TenantProvider';
-import { AppIcon } from '../../../components/ui/AppIcon';
-import { TenantDTO } from '../../../types/api.types';
+import React from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useOrganization } from '../../../app/providers/OrganizationProvider';
 
 export function SelectOrganizationPage() {
   const navigate = useNavigate();
-  const { setAuth } = useAuth();
-  const { setTenant } = useTenant();
-  
-  const token = localStorage.getItem('temp_access_token');
-  const userStr = localStorage.getItem('temp_user');
-  
-  useEffect(() => {
-    if (!token || !userStr) {
-      navigate('/auth/login');
-    }
-  }, [token, userStr, navigate]);
+  const location = useLocation();
 
-  if (!token || !userStr) return null;
-  
-  const user = JSON.parse(userStr);
-  const tenants = user.tenants as TenantDTO[];
+  const {
+    organizations,
+    activeOrganization,
+    setActiveOrganization,
+  } = useOrganization();
 
-  const handleSelectTenant = (tenant: TenantDTO) => {
-    // Clear temporary auth data
-    localStorage.removeItem('temp_access_token');
-    localStorage.removeItem('temp_user');
-    
-    // Set active organization in context
-    setTenant(tenant);
-    
-    // Finalize authentication which globally stores session and triggers UI updates
-    setAuth(user, token);
-    
-    // Redirect to dashboard now that tenant context is established
-    navigate('/');
+  const from =
+    (location.state as {
+      from?: {
+        pathname?: string;
+        search?: string;
+        hash?: string;
+      };
+    } | null)?.from;
+
+  const handleSelect = (
+    organization: typeof organizations[number],
+  ) => {
+    setActiveOrganization(organization);
+
+    navigate(
+      from?.pathname
+        ? `${from.pathname}${from.search ?? ''}${from.hash ?? ''}`
+        : '/',
+      { replace: true },
+    );
   };
 
-  return (
-    <div className="w-full animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="mb-8 hidden lg:block">
-        <AppIcon name="book-open" className="w-10 h-10 text-indigo-600 mb-6" />
-        <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">Select Organization</h2>
-        <p className="mt-2 text-slate-500 text-sm">Where would you like to continue?</p>
-      </div>
+  if (organizations.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
+        <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+          <h1 className="text-xl font-semibold text-slate-900">
+            No organizations available
+          </h1>
 
-      <div className="mb-8 lg:hidden">
-        <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">Select Organization</h2>
-        <p className="mt-2 text-slate-500 text-sm">Where would you like to continue?</p>
-      </div>
+          <p className="mt-2 text-sm text-slate-500">
+            Your account is not currently a member of any organization.
+          </p>
 
-      <div className="space-y-4">
-        {tenants.map((tenant) => (
           <button
-            key={tenant.id}
-            onClick={() => handleSelectTenant(tenant)}
-            className="w-full flex items-center justify-between p-5 bg-white border border-slate-200 rounded-2xl hover:border-indigo-300 hover:shadow-md transition-all group text-left"
+            type="button"
+            onClick={() => navigate('/', { replace: true })}
+            className="mt-6 w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-indigo-700"
           >
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center border border-indigo-100 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-                <AppIcon name="building" className="w-6 h-6" />
-              </div>
-              <div>
-                <h3 className="text-base font-semibold text-slate-900">{tenant.name}</h3>
-                <p className="text-sm text-slate-500 capitalize">{tenant.role.replace('_', ' ')}</p>
-              </div>
-            </div>
-            <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-indigo-50 transition-colors">
-              <AppIcon name="chevron-right" className="w-5 h-5 text-slate-400 group-hover:text-indigo-600" />
-            </div>
+            Continue
           </button>
-        ))}
+        </div>
       </div>
+    );
+  }
 
-      <div className="mt-8 text-center text-sm">
-        <button
-          onClick={() => {
-            localStorage.removeItem('temp_access_token');
-            localStorage.removeItem('temp_user');
-            navigate('/auth/login');
-          }}
-          className="font-medium text-slate-500 hover:text-slate-700"
-        >
-          Cancel and go back
-        </button>
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
+      <div className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+        <div className="mb-6">
+          <h1 className="text-2xl font-semibold text-slate-900">
+            Select organization
+          </h1>
+
+          <p className="mt-2 text-sm text-slate-500">
+            Choose the organization you want to work in.
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          {organizations.map((organization) => {
+            const selected =
+              activeOrganization?.uuid === organization.uuid;
+
+            return (
+              <button
+                key={organization.uuid}
+                type="button"
+                onClick={() => handleSelect(organization)}
+                className={`flex w-full items-center justify-between rounded-xl border px-4 py-4 text-left transition-colors ${
+                  selected
+                    ? 'border-indigo-300 bg-indigo-50'
+                    : 'border-slate-200 bg-white hover:border-indigo-200 hover:bg-slate-50'
+                }`}
+              >
+                <div className="min-w-0">
+                  <div className="truncate text-sm font-semibold text-slate-900">
+                    {organization.name}
+                  </div>
+
+                  <div className="mt-1 truncate text-xs text-slate-500">
+                    {organization.slug}
+                  </div>
+                </div>
+
+                {selected && (
+                  <span className="ml-4 shrink-0 text-xs font-medium text-indigo-600">
+                    Selected
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

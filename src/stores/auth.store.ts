@@ -1,39 +1,49 @@
 import { create } from 'zustand';
-import { UserDTO, TenantDTO } from '../types/api.types';
+import type {
+  AuthUserDTO,
+  OrganizationDTO,
+} from '../types';
 import { authApi } from '../services/api/auth.api';
 
+type AuthStatus =
+  | 'unauthenticated'
+  | 'mfa_pending'
+  | 'authenticated';
+
+interface MfaChallenge {
+  challengeId: string;
+  method?: string | null;
+  expiresIn?: number | null;
+}
+
 interface AuthState {
-  user: UserDTO | null;
-  activeTenant: TenantDTO | null;
-  isAuthenticated: boolean;
+  user: AuthUserDTO | null;
+  activeOrganization: OrganizationDTO | null;
+  status: AuthStatus;
   isLoading: boolean;
   accessToken: string | null;
+  mfaChallenge: MfaChallenge | null;
 
-  setAuth: (user: UserDTO, token?: string) => void;
-  setActiveTenant: (tenant: TenantDTO) => void;
-  clearActiveTenant: () => void;
+  setAuth: (user: AuthUserDTO, token?: string) => void;
+  setMfaPending: (
+    user: AuthUserDTO,
+    challenge: MfaChallenge,
+  ) => void;
+  clearMfaChallenge: () => void;
+  setActiveOrganization: (
+    organization: OrganizationDTO,
+  ) => void;
+  clearActiveOrganization: () => void;
   logout: () => Promise<void>;
   checkAuth: (force?: boolean) => Promise<void>;
 }
 
 const ACCESS_TOKEN_KEY = 'access_token';
-const ACTIVE_TENANT_KEY = 'active_tenant_id';
+const ACTIVE_ORGANIZATION_KEY = 'active_organization_uuid';
 
-const resolveActiveTenant = (user: UserDTO | null, tenantId?: string | null): TenantDTO | null => {
-  if (!user?.tenants?.length) {
-    return null;
-  }
-
-  const normalizedTenantId = tenantId ?? getStorageItem(ACTIVE_TENANT_KEY);
-
-  if (!normalizedTenantId) {
-    return null;
-  }
-
-  return user.tenants.find((tenant) => String(tenant.id) === String(normalizedTenantId)) ?? null;
-};
-
-const getStorageItem = (key: string): string | null => {
+const getStorageItem = (
+  key: string,
+): string | null => {
   if (typeof window === 'undefined') {
     return null;
   }
@@ -41,7 +51,10 @@ const getStorageItem = (key: string): string | null => {
   return localStorage.getItem(key);
 };
 
-const setStorageItem = (key: string, value: string): void => {
+const setStorageItem = (
+  key: string,
+  value: string,
+): void => {
   if (typeof window === 'undefined') {
     return;
   }
@@ -49,7 +62,9 @@ const setStorageItem = (key: string, value: string): void => {
   localStorage.setItem(key, value);
 };
 
-const removeStorageItem = (key: string): void => {
+const removeStorageItem = (
+  key: string,
+): void => {
   if (typeof window === 'undefined') {
     return;
   }
@@ -57,58 +72,145 @@ const removeStorageItem = (key: string): void => {
   localStorage.removeItem(key);
 };
 
+const resolveActiveOrganization = (
+  user: AuthUserDTO | null,
+  organizationUuid?: string | null,
+): OrganizationDTO | null => {
+  const organizations = user?.organizations ?? [];
+
+  if (organizations.length === 0) {
+    return null;
+  }
+
+  const normalizedUuid =
+    organizationUuid ??
+    getStorageItem(ACTIVE_ORGANIZATION_KEY);
+
+  if (normalizedUuid) {
+    return (
+      organizations.find(
+        (organization) =>
+          organization.uuid === normalizedUuid,
+      ) ?? null
+    );
+  }
+
+  if (organizations.length === 1) {
+    return organizations[0];
+  }
+
+  return null;
+};
+
 export const useAuth = create<AuthState>((set, get) => ({
   user: null,
-  activeTenant: null,
-  isAuthenticated: false,
+  activeOrganization: null,
+  status: 'unauthenticated',
   isLoading: true,
   accessToken: getStorageItem(ACCESS_TOKEN_KEY),
+  mfaChallenge: null,
 
   /**
    * Called immediately after successful login/register/Google auth.
    */
   setAuth: (user, token) => {
-    const authToken = token ?? getStorageItem(ACCESS_TOKEN_KEY) ?? null;
+    const authToken =
+      token ??
+      getStorageItem(ACCESS_TOKEN_KEY) ??
+      null;
 
     if (authToken) {
-      setStorageItem(ACCESS_TOKEN_KEY, authToken);
+      setStorageItem(
+        ACCESS_TOKEN_KEY,
+        authToken,
+      );
     }
 
-    const activeTenant = resolveActiveTenant(user, getStorageItem(ACTIVE_TENANT_KEY));
+    const storedOrganizationUuid =
+      getStorageItem(
+        ACTIVE_ORGANIZATION_KEY,
+      );
+
+    const activeOrganization =
+      resolveActiveOrganization(
+        user,
+        storedOrganizationUuid,
+      );
+
+    if (
+      activeOrganization &&
+      !storedOrganizationUuid
+    ) {
+      setStorageItem(
+        ACTIVE_ORGANIZATION_KEY,
+        activeOrganization.uuid,
+      );
+    }
 
     set({
       user,
-      activeTenant,
+      activeOrganization,
       accessToken: authToken,
-      isAuthenticated: !!authToken || !!user,
+      status: authToken
+        ? 'authenticated'
+        : 'unauthenticated',
+      mfaChallenge: null,
       isLoading: false,
     });
   },
 
-  /**
-   * Select the organization/tenant the user wants to work in.
-   */
-  setActiveTenant: (tenant) => {
-    if (!tenant?.id) {
-      return;
-    }
+  setMfaPending: (
+    user,
+    challenge,
+  ) => {
+    set({
+      user,
+      status: 'mfa_pending',
+      mfaChallenge: challenge,
+      isLoading: false,
+    });
+  },
 
-    setStorageItem(ACTIVE_TENANT_KEY, String(tenant.id));
-
-    set((state) => ({
-      activeTenant: tenant,
-      user: state.user ? { ...state.user, role: state.user.role } : state.user,
-    }));
+  clearMfaChallenge: () => {
+    set({
+      mfaChallenge: null,
+      status: 'unauthenticated',
+    });
   },
 
   /**
-   * Clear only the active tenant.
+   * Select the organization the user wants to work in.
+   *
+   * The organization UUID is the public context identifier.
+   * The backend receives it through X-Organization-ID.
    */
-  clearActiveTenant: () => {
-    removeStorageItem(ACTIVE_TENANT_KEY);
+  setActiveOrganization: (
+    organization,
+  ) => {
+    if (!organization?.uuid) {
+      return;
+    }
+
+    setStorageItem(
+      ACTIVE_ORGANIZATION_KEY,
+      organization.uuid,
+    );
 
     set({
-      activeTenant: null,
+      activeOrganization: organization,
+    });
+  },
+
+  /**
+   * Clear only the active organization.
+   */
+  clearActiveOrganization: () => {
+    removeStorageItem(
+      ACTIVE_ORGANIZATION_KEY,
+    );
+
+    set({
+      activeOrganization: null,
     });
   },
 
@@ -117,75 +219,115 @@ export const useAuth = create<AuthState>((set, get) => ({
    *
    * Important:
    * - Does not blindly overwrite an already established session.
-   * - Restores the active tenant from localStorage.
-   * - Never modifies user.role.
+   * - Restores the active organization from localStorage.
+   * - Automatically selects a single available organization.
+   * - Never modifies role or permission information.
    */
-  checkAuth: async (force = false) => {
+  checkAuth: async (
+    force = false,
+  ) => {
     const state = get();
 
-    if (!force && state.isAuthenticated && state.user && state.accessToken) {
+    if (
+      !force &&
+      state.status === 'authenticated' &&
+      state.user &&
+      state.accessToken
+    ) {
       return;
     }
 
-    const token = getStorageItem(ACCESS_TOKEN_KEY);
+    const token =
+      getStorageItem(ACCESS_TOKEN_KEY);
 
     if (!token) {
-      if (state.user || state.isAuthenticated || state.accessToken) {
-        removeStorageItem(ACTIVE_TENANT_KEY);
-        set({
-          user: null,
-          activeTenant: null,
-          accessToken: null,
-          isAuthenticated: false,
-          isLoading: false,
-        });
-      } else {
-        set({
-          isLoading: false,
-          isAuthenticated: false,
-          user: null,
-          activeTenant: null,
-          accessToken: null,
-        });
-      }
+      removeStorageItem(
+        ACTIVE_ORGANIZATION_KEY,
+      );
+
+      set({
+        user: null,
+        activeOrganization: null,
+        accessToken: null,
+        status: 'unauthenticated',
+        isLoading: false,
+        mfaChallenge: null,
+      });
+
       return;
     }
 
-    set({ isLoading: true });
+    set({
+      isLoading: true,
+    });
 
     try {
-      const user = await authApi.me();
+      const user =
+        await authApi.me();
 
       if (!user) {
-        throw new Error('Unable to retrieve authenticated user');
+        throw new Error(
+          'Unable to retrieve authenticated user',
+        );
       }
 
-      const activeTenantId = getStorageItem(ACTIVE_TENANT_KEY);
-      const activeTenant = resolveActiveTenant(user, activeTenantId);
+      const activeOrganizationUuid =
+        getStorageItem(
+          ACTIVE_ORGANIZATION_KEY,
+        );
 
-      if (activeTenantId && !activeTenant) {
-        removeStorageItem(ACTIVE_TENANT_KEY);
+      const activeOrganization =
+        resolveActiveOrganization(
+          user,
+          activeOrganizationUuid,
+        );
+
+      if (
+        activeOrganizationUuid &&
+        !activeOrganization
+      ) {
+        removeStorageItem(
+          ACTIVE_ORGANIZATION_KEY,
+        );
+      }
+
+      if (
+        activeOrganization &&
+        !activeOrganizationUuid
+      ) {
+        setStorageItem(
+          ACTIVE_ORGANIZATION_KEY,
+          activeOrganization.uuid,
+        );
       }
 
       set({
         user,
-        activeTenant,
+        activeOrganization,
         accessToken: token,
-        isAuthenticated: true,
+        status: 'authenticated',
         isLoading: false,
       });
     } catch (error) {
-      console.error('Authentication check failed:', error);
+      console.error(
+        'Authentication check failed:',
+        error,
+      );
 
-      removeStorageItem(ACCESS_TOKEN_KEY);
-      removeStorageItem(ACTIVE_TENANT_KEY);
+      removeStorageItem(
+        ACCESS_TOKEN_KEY,
+      );
+      removeStorageItem(
+        ACTIVE_ORGANIZATION_KEY,
+      );
 
       set({
         user: null,
-        activeTenant: null,
+        activeOrganization: null,
         accessToken: null,
-        isAuthenticated: false,
+        status: 'unauthenticated',
         isLoading: false,
+        mfaChallenge: null,
       });
     }
   },
@@ -197,23 +339,25 @@ export const useAuth = create<AuthState>((set, get) => ({
     try {
       await authApi.logout();
     } catch (error) {
-      /**
-       * Even if the API logout fails, clear the local session.
-       */
       console.error(
         'Logout request failed:',
-        error
+        error,
       );
     } finally {
-      removeStorageItem(ACCESS_TOKEN_KEY);
-      removeStorageItem(ACTIVE_TENANT_KEY);
+      removeStorageItem(
+        ACCESS_TOKEN_KEY,
+      );
+      removeStorageItem(
+        ACTIVE_ORGANIZATION_KEY,
+      );
 
       set({
         user: null,
-        activeTenant: null,
+        activeOrganization: null,
         accessToken: null,
-        isAuthenticated: false,
+        status: 'unauthenticated',
         isLoading: false,
+        mfaChallenge: null,
       });
     }
   },
@@ -223,4 +367,3 @@ export const useAuth = create<AuthState>((set, get) => ({
  * Backward compatibility.
  */
 export const useAuthStore = useAuth;
-

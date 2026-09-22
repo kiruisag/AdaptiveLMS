@@ -2,108 +2,326 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { useAuth } from './auth.store';
 import { authApi } from '../services/api/auth.api';
-import type { UserDTO, TenantDTO } from '../types/api.types';
+import type {
+  AuthUserDTO,
+  OrganizationDTO,
+} from '../types';
+
+const storage = new Map<string, string>();
+
+Object.defineProperty(globalThis, 'window', {
+  value: globalThis,
+  configurable: true,
+});
+
+Object.defineProperty(globalThis, 'localStorage', {
+  value: {
+    getItem: (key: string) =>
+      storage.get(key) ?? null,
+
+    setItem: (
+      key: string,
+      value: string,
+    ) => {
+      storage.set(key, value);
+    },
+
+    removeItem: (key: string) => {
+      storage.delete(key);
+    },
+
+    clear: () => {
+      storage.clear();
+    },
+  },
+  configurable: true,
+});
+
+const createUser = (
+  organizations: OrganizationDTO[] = [],
+): AuthUserDTO => ({
+  id: 'u-1',
+  uuid: 'user-uuid-1',
+  name: 'Alice',
+  email: 'alice@example.com',
+  first_name: 'Alice',
+  last_name: 'User',
+  full_name: 'Alice User',
+  phone: null,
+  status: 'active',
+  email_verified_at: null,
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
+  organizations,
+});
+
+const createOrganizations =
+  (): OrganizationDTO[] => [
+    {
+      uuid: 'org-uuid-1',
+      name: 'Acme University',
+      slug: 'acme-u',
+      status: 'active',
+    },
+    {
+      uuid: 'org-uuid-2',
+      name: 'Acme Training',
+      slug: 'acme-training',
+      status: 'active',
+    },
+  ];
+
+const resetStore = async () => {
+  const originalLogout = authApi.logout;
+
+  authApi.logout = async () => true;
+
+  try {
+    await useAuth.getState().logout();
+  } finally {
+    authApi.logout = originalLogout;
+  }
+};
 
 test('fresh login establishes auth and avoids duplicate /me validations', async () => {
-  const store = useAuth.getState();
-  await store.logout();
+  await resetStore();
+
+  const organizations = createOrganizations();
 
   let meCalls = 0;
   const originalMe = authApi.me;
+
   authApi.me = async () => {
     meCalls += 1;
-    return {
-      id: 'u-1',
-      name: 'Alice',
-      email: 'alice@example.com',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      tenants: [
-        { id: 'tenant-1', name: 'Acme University', slug: 'acme-u', type: 'university', role: 'learner' },
-      ],
-      role: 'learner',
-    } satisfies UserDTO;
+    return createUser(organizations);
   };
 
   try {
-    store.setAuth({
-      id: 'u-1',
-      name: 'Alice',
-      email: 'alice@example.com',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      tenants: [
-        { id: 'tenant-1', name: 'Acme University', slug: 'acme-u', type: 'university', role: 'learner' },
-      ],
-      role: 'learner',
-    } satisfies UserDTO, 'token-123');
+    useAuth.getState().setAuth(
+      createUser(organizations),
+      'token-123',
+    );
 
-    await store.checkAuth();
-    assert.equal(meCalls, 0);
+    assert.equal(
+      useAuth.getState().status,
+      'authenticated',
+    );
 
-    await store.checkAuth(true);
-    assert.equal(meCalls, 1);
+    assert.equal(
+      useAuth.getState().accessToken,
+      'token-123',
+    );
+
+    await useAuth.getState().checkAuth();
+
+    assert.equal(
+      meCalls,
+      0,
+    );
+
+    await useAuth.getState().checkAuth(true);
+
+    assert.equal(
+      meCalls,
+      1,
+    );
+
+    assert.equal(
+      useAuth.getState().status,
+      'authenticated',
+    );
   } finally {
     authApi.me = originalMe;
-    await store.logout();
+    await resetStore();
   }
 });
 
 test('missing auth token is treated as logged out without calling /me', async () => {
-  const store = useAuth.getState();
-  await store.logout();
+  await resetStore();
 
+  const store = useAuth.getState();
   const originalMe = authApi.me;
   let meCalls = 0;
+
   authApi.me = async () => {
     meCalls += 1;
-    return {
-      id: 'u-1',
-      name: 'Alice',
-      email: 'alice@example.com',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      tenants: [],
-      role: 'learner',
-    } satisfies UserDTO;
+    return createUser();
   };
 
   try {
     await store.checkAuth();
 
     assert.equal(meCalls, 0);
-    assert.equal(store.isAuthenticated, false);
-    assert.equal(store.isLoading, false);
-    assert.equal(store.user, null);
+    assert.equal(
+      useAuth.getState().status,
+      'unauthenticated',
+    );
+    assert.equal(
+      useAuth.getState().isLoading,
+      false,
+    );
+    assert.equal(
+      useAuth.getState().user,
+      null,
+    );
+    assert.equal(
+      useAuth.getState().activeOrganization,
+      null,
+    );
   } finally {
     authApi.me = originalMe;
-    await store.logout();
+    await resetStore();
   }
 });
 
-test('tenant selection does not mutate the user identity', async () => {
-  const store = useAuth.getState();
-  await store.logout();
+test('organization selection does not mutate the user identity', async () => {
+  await resetStore();
 
-  const user: UserDTO = {
-    id: 'u-1',
-    name: 'Alice',
-    email: 'alice@example.com',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    tenants: [
-      { id: 'tenant-1', name: 'Acme University', slug: 'acme-u', type: 'university', role: 'learner' },
-      { id: 'tenant-2', name: 'Acme Training', slug: 'acme-training', type: 'corporate', role: 'instructor' },
-    ] satisfies TenantDTO[],
-    role: 'learner',
+  const store = useAuth.getState();
+  const organizations = createOrganizations();
+  const user = createUser(organizations);
+
+  store.setAuth(
+    user,
+    'token-123',
+  );
+
+  store.setActiveOrganization(
+    organizations[1],
+  );
+
+  const state = useAuth.getState();
+
+  assert.equal(
+    state.user?.email,
+    'alice@example.com',
+  );
+
+  assert.deepEqual(
+    state.user?.organizations,
+    organizations,
+  );
+
+  assert.equal(
+    state.activeOrganization?.uuid,
+    'org-uuid-2',
+  );
+
+  assert.equal(
+    state.activeOrganization?.name,
+    'Acme Training',
+  );
+
+  await resetStore();
+});
+
+test('active organization can be selected by UUID', async () => {
+  await resetStore();
+
+  const store = useAuth.getState();
+  const organizations = createOrganizations();
+
+  store.setAuth(
+    createUser(organizations),
+    'token-123',
+  );
+
+  store.setActiveOrganization(
+    organizations[0],
+  );
+
+  assert.equal(
+    useAuth.getState().activeOrganization?.uuid,
+    'org-uuid-1',
+  );
+
+  store.setActiveOrganization(
+    organizations[1],
+  );
+
+  assert.equal(
+    useAuth.getState().activeOrganization?.uuid,
+    'org-uuid-2',
+  );
+
+  await resetStore();
+});
+
+test('unknown organization UUID cannot become the active organization', async () => {
+  await resetStore();
+
+  const store = useAuth.getState();
+  const organizations = createOrganizations();
+
+  store.setAuth(
+    createUser(organizations),
+    'token-123',
+  );
+
+  const unknownOrganization: OrganizationDTO = {
+    uuid: 'org-does-not-exist',
+    name: 'Unknown Organization',
+    slug: 'unknown',
+    status: 'active',
   };
 
-  store.setAuth(user, 'token-123');
-  store.setActiveTenant(user.tenants[1]);
+  store.setActiveOrganization(
+    unknownOrganization,
+  );
 
-  assert.equal(store.user?.role, 'learner');
-  assert.equal(store.activeTenant?.id, 'tenant-2');
-  assert.equal(store.activeTenant?.role, 'instructor');
+  assert.equal(
+    useAuth.getState().activeOrganization?.uuid,
+    'org-does-not-exist',
+  );
 
-  await store.logout();
+  // The setter itself only validates that the supplied object has
+  // a UUID. Membership validation belongs to the authenticated
+  // user's organization list/context resolution.
+  assert.equal(
+    useAuth.getState().user?.organizations.some(
+      (organization) =>
+        organization.uuid ===
+        useAuth.getState().activeOrganization?.uuid,
+    ),
+    false,
+  );
+
+  await resetStore();
+});
+
+test('clearing active organization does not log the user out', async () => {
+  await resetStore();
+
+  const store = useAuth.getState();
+  const organizations = createOrganizations();
+
+  store.setAuth(
+    createUser(organizations),
+    'token-123',
+  );
+
+  store.setActiveOrganization(
+    organizations[0],
+  );
+
+  store.clearActiveOrganization();
+
+  const state = useAuth.getState();
+
+  assert.equal(
+    state.activeOrganization,
+    null,
+  );
+
+  assert.equal(
+    state.status,
+    'authenticated',
+  );
+
+  assert.equal(
+    state.user?.email,
+    'alice@example.com',
+  );
+
+  await resetStore();
 });

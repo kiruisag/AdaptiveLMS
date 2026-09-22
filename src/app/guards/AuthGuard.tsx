@@ -1,40 +1,61 @@
-import React, { useEffect } from 'react';
+import type { ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../stores/auth.store';
-import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
 
-export function AuthGuard({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isLoading, activeTenant, user, checkAuth } = useAuthStore();
-  const location = useLocation();
-
-  useEffect(() => {
-    void checkAuth();
-  }, [checkAuth]);
-
-  if (isLoading) {
-    return <div className="flex h-screen items-center justify-center"><LoadingSpinner size="lg" text="Authenticating..." /></div>;
-  }
-
-  if (!isAuthenticated || !user) {
-    return <Navigate to="/auth/login" state={{ from: location }} replace />;
-  }
-
-  const hasMultiTenantSelection = Array.isArray(user.tenants) && user.tenants.length > 1;
-  const requiresTenantSelection = hasMultiTenantSelection && !activeTenant && location.pathname !== '/auth/select-organization';
-
-  if (requiresTenantSelection) {
-    return <Navigate to="/auth/select-organization" replace />;
-  }
-
-  return <>{children}</>;
+interface AuthGuardProps {
+  children: ReactNode;
 }
 
-export function RoleGuard({ allowedRoles, children }: { allowedRoles: string[], children: React.ReactNode }) {
-  const { user, activeTenant } = useAuthStore();
-  const currentRole = activeTenant?.role ?? user?.role ?? null;
+export function AuthGuard({ children }: AuthGuardProps) {
+  const {
+    status,
+    isLoading,
+    activeOrganization,
+    user,
+  } = useAuthStore();
 
-  if (!user || !currentRole || !allowedRoles.includes(currentRole)) {
-    return <Navigate to="/auth/select-organization" replace />;
+  const location = useLocation();
+
+  if (isLoading) {
+    return null;
+  }
+
+  if (status === 'unauthenticated' || !user) {
+    return (
+      <Navigate
+        to="/auth/login"
+        replace
+        state={{ from: location }}
+      />
+    );
+  }
+
+  if (status === 'mfa_pending') {
+    return (
+      <Navigate
+        to="/auth/mfa"
+        replace
+      />
+    );
+  }
+
+  const organizations = user.organizations ?? [];
+
+  const hasMultipleOrganizations =
+    organizations.length > 1;
+
+  if (
+    hasMultipleOrganizations &&
+    !activeOrganization &&
+    location.pathname !== '/auth/select-organization'
+  ) {
+    return (
+      <Navigate
+        to="/auth/select-organization"
+        replace
+        state={{ from: location }}
+      />
+    );
   }
 
   return <>{children}</>;
