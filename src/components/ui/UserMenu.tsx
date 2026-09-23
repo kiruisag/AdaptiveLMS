@@ -1,108 +1,251 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, {
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import { AppIcon } from './AppIcon';
 import { useAuthStore } from '../../stores/auth.store';
 import { useUiStore } from '../../stores/ui.store';
 
 export function UserMenu() {
-  const [isOpen, setIsOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
-  const { user, logout } = useAuthStore();
-  const { theme, toggleTheme } = useUiStore();
+  const [isOpen, setIsOpen] =
+    useState(false);
+
+  const menuRef =
+    useRef<HTMLDivElement>(null);
+
+  const navigate = useNavigate();
+
+  const { user, logout } =
+    useAuthStore();
+
+  const { theme, toggleTheme } =
+    useUiStore();
 
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+    function handleClickOutside(
+      event: MouseEvent,
+    ) {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(
+          event.target as Node,
+        )
+      ) {
         setIsOpen(false);
       }
     }
-    
+
     if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener(
+        'mousedown',
+        handleClickOutside,
+      );
     }
-    
+
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener(
+        'mousedown',
+        handleClickOutside,
+      );
     };
   }, [isOpen]);
 
-  if (!user) return null;
+  if (!user) {
+    return null;
+  }
+  const displayName =
+  user.full_name ??
+  user.name ??
+  (
+    [
+      user.first_name,
+      user.last_name,
+    ]
+      .filter(Boolean)
+      .join(' ') || 'User'
+  );
 
-  // Get user initials for the avatar
-  const initials = user.name
-    ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)
-    : 'U';
+  const initials =
+    [
+      user.first_name,
+      user.last_name,
+    ]
+      .filter(Boolean)
+      .map(
+        (name) => name?.charAt(0),
+      )
+      .join('')
+      .toUpperCase()
+      .substring(0, 2) || 'U';
+
+  const handleProfile = () => {
+    setIsOpen(false);
+    navigate('/profile');
+  };
+
+  const handleSessions = () => {
+    setIsOpen(false);
+    navigate('/auth/sessions');
+  };
+
+  const handleLogout = async () => {
+    setIsOpen(false);
+    await logout();
+    navigate('/auth/login', {
+      replace: true,
+    });
+  };
 
   return (
-    <div className="relative" ref={menuRef}>
+    <div
+      className="relative"
+      ref={menuRef}
+    >
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 focus:outline-none"
+        type="button"
+        onClick={() =>
+          setIsOpen((current) => !current)
+        }
+        className="flex items-center gap-2 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
         aria-expanded={isOpen}
-        aria-haspopup="true"
+        aria-haspopup="menu"
+        aria-label="Open user menu"
       >
-        <div className="w-8 h-8 bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center rounded-full border border-indigo-200 shadow-sm hover:bg-indigo-200 transition-colors">
-          <span className="text-sm tracking-tighter">{initials}</span>
+        <div className="flex h-8 w-8 items-center justify-center rounded-full border border-indigo-200 bg-indigo-100 font-bold text-indigo-700 shadow-sm transition-colors hover:bg-indigo-200">
+          <span className="text-sm tracking-tighter">
+            {initials}
+          </span>
         </div>
+
+        <AppIcon
+          name={
+            isOpen
+              ? 'chevron-up'
+              : 'chevron-down'
+          }
+          className="h-3 w-3 text-slate-400"
+        />
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-slate-200 z-50 overflow-hidden transform origin-top-right transition-all">
-          <div className="px-4 py-3 bg-slate-50 border-b border-slate-100">
-            <p className="text-sm font-semibold text-slate-900 truncate">{user.name}</p>
-            <p className="text-xs text-slate-500 truncate">{user.email}</p>
+        <div
+          className="absolute right-0 z-50 mt-2 w-64 origin-top-right overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl"
+          role="menu"
+        >
+          {/* User information */}
+          <div className="border-b border-slate-100 bg-slate-50 px-4 py-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-indigo-100 font-semibold text-indigo-700">
+                {initials}
+              </div>
+
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold text-slate-900">
+                  {displayName}
+                </p>
+
+                <p className="truncate text-xs text-slate-500">
+                  {user.email}
+                </p>
+              </div>
+            </div>
           </div>
-          
-          <div className="p-1">
+
+          {/* Account */}
+          <div className="p-1.5">
             <button
-              onClick={() => {
-                setIsOpen(false);
-                // Handle navigation to profile in a real app
-                // navigate('/profile')
-              }}
-              className="w-full text-left flex items-center px-3 py-2 text-sm text-slate-700 rounded-md hover:bg-slate-100 hover:text-slate-900 transition-colors"
+              type="button"
+              onClick={handleProfile}
+              role="menuitem"
+              className="flex w-full items-center rounded-lg px-3 py-2.5 text-left text-sm text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900"
             >
-              <AppIcon name="user" className="w-4 h-4 mr-2 text-slate-400" />
+              <AppIcon
+                name="user"
+                className="mr-3 h-4 w-4 text-slate-400"
+              />
+
               <span>Profile</span>
             </button>
+
             <button
-              onClick={() => {
-                setIsOpen(false);
-                // Handle navigation to settings
-              }}
-              className="w-full text-left flex items-center px-3 py-2 text-sm text-slate-700 rounded-md hover:bg-slate-100 hover:text-slate-900 transition-colors"
+              type="button"
+              onClick={handleSessions}
+              role="menuitem"
+              className="flex w-full items-center rounded-lg px-3 py-2.5 text-left text-sm text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900"
             >
-              <AppIcon name="gear" className="w-4 h-4 mr-2 text-slate-400" />
-              <span>Settings</span>
+              <AppIcon
+                name="laptop"
+                className="mr-3 h-4 w-4 text-slate-400"
+              />
+
+              <span>Active Sessions</span>
             </button>
+          </div>
+
+          {/* Preferences */}
+          <div className="border-t border-slate-100 p-1.5">
             <button
-              onClick={() => {
-                toggleTheme();
-              }}
-              className="w-full text-left flex items-center justify-between px-3 py-2 text-sm text-slate-700 rounded-md hover:bg-slate-100 hover:text-slate-900 transition-colors"
+              type="button"
+              onClick={toggleTheme}
+              role="menuitem"
+              className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900"
             >
               <div className="flex items-center">
                 {theme === 'dark' ? (
-                  <AppIcon name="moon" className="w-4 h-4 mr-2 text-slate-400" />
+                  <AppIcon
+                    name="moon"
+                    className="mr-3 h-4 w-4 text-slate-400"
+                  />
                 ) : (
-                  <AppIcon name="sun" className="w-4 h-4 mr-2 text-slate-400" />
+                  <AppIcon
+                    name="sun"
+                    className="mr-3 h-4 w-4 text-slate-400"
+                  />
                 )}
-                <span>{theme === 'dark' ? 'Dark Mode' : 'Light Mode'}</span>
+
+                <span>
+                  {theme === 'dark'
+                    ? 'Dark Mode'
+                    : 'Light Mode'}
+                </span>
               </div>
-              <div className={`w-8 h-4 flex items-center rounded-full p-0.5 transition-colors ${theme === 'dark' ? 'bg-indigo-600' : 'bg-slate-300'}`}>
-                <div className={`w-3 h-3 bg-white rounded-full shadow-sm transform transition-transform ${theme === 'dark' ? 'translate-x-4' : 'translate-x-0'}`} />
+
+              <div
+                className={`flex h-4 w-8 items-center rounded-full p-0.5 transition-colors ${
+                  theme === 'dark'
+                    ? 'bg-indigo-600'
+                    : 'bg-slate-300'
+                }`}
+              >
+                <div
+                  className={`h-3 w-3 transform rounded-full bg-white shadow-sm transition-transform ${
+                    theme === 'dark'
+                      ? 'translate-x-4'
+                      : 'translate-x-0'
+                  }`}
+                />
               </div>
             </button>
           </div>
-          
-          <div className="p-1 border-t border-slate-100">
+
+          {/* Sign out */}
+          <div className="border-t border-slate-100 p-1.5">
             <button
+              type="button"
               onClick={() => {
-                setIsOpen(false);
-                logout();
+                void handleLogout();
               }}
-              className="w-full text-left flex items-center px-3 py-2 text-sm text-red-600 rounded-md hover:bg-red-50 transition-colors"
+              role="menuitem"
+              className="flex w-full items-center rounded-lg px-3 py-2.5 text-left text-sm text-red-600 transition-colors hover:bg-red-50"
             >
-              <AppIcon name="right-from-bracket" className="w-4 h-4 mr-2 text-red-500" />
+              <AppIcon
+                name="sign-out-alt"
+                className="mr-3 h-4 w-4 text-red-500"
+              />
+
               <span>Sign Out</span>
             </button>
           </div>

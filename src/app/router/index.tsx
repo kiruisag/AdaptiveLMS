@@ -9,6 +9,11 @@ import { AuthLayout } from '../layouts/AuthLayout';
 import { AppLayout } from '../layouts/AppLayout';
 import { AuthGuard } from '../guards/AuthGuard';
 
+/*
+|--------------------------------------------------------------------------
+| Authentication
+|--------------------------------------------------------------------------
+*/
 import { LoginForm } from '../../features/auth/components/LoginForm';
 import { MfaChallengePage } from '../../features/auth/pages/MfaChallengePage';
 import { RegisterPage } from '../../features/auth/pages/RegisterPage';
@@ -17,25 +22,68 @@ import { ForgotPasswordPage } from '../../features/auth/pages/ForgotPasswordPage
 import { ResetPasswordPage } from '../../features/auth/pages/ResetPasswordPage';
 import { VerifyEmailPage } from '../../features/auth/pages/VerifyEmailPage';
 import { SessionsPage } from '../../features/auth/pages/SessionsPage';
+import { AcceptInvitationPage } from '../../features/auth/pages/AcceptInvitationPage';
+import { SecurityPage } from '../../features/auth/pages/SecuritySetupPage';
+import { MfaSetupPage } from '../../features/auth/pages/MfaSetupPage';
+/*
+|--------------------------------------------------------------------------
+| Profile
+|--------------------------------------------------------------------------
+*/
+import { ProfilePage } from '../../features/auth/pages/ProfilePage';
 
+/*
+|--------------------------------------------------------------------------
+| Dashboard
+|--------------------------------------------------------------------------
+*/
 import { DashboardRouter } from '../../features/dashboard/components/DashboardRouter';
 
+/*
+|--------------------------------------------------------------------------
+| Learning
+|--------------------------------------------------------------------------
+*/
 import { CourseCatalog } from '../../features/courses/components/CourseCatalog';
 import { CourseDetails } from '../../features/courses/components/CourseDetails';
-
 import { LearningPlayer } from '../../features/learning/components/LearningPlayer';
 
+/*
+|--------------------------------------------------------------------------
+| Assessment
+|--------------------------------------------------------------------------
+*/
 import { AssessmentPlayer } from '../../features/assessments/components/AssessmentPlayer';
 
+/*
+|--------------------------------------------------------------------------
+| AI Tutor
+|--------------------------------------------------------------------------
+*/
 import { AITutor } from '../../features/ai-tutor/components/AITutor';
 
+/*
+|--------------------------------------------------------------------------
+| Question Bank
+|--------------------------------------------------------------------------
+*/
 import { QuestionBank } from '../../features/question-bank/components/QuestionBank';
 
+/*
+|--------------------------------------------------------------------------
+| Progress
+|--------------------------------------------------------------------------
+*/
 import { LearnerProgress } from '../../features/progress/components/LearnerProgress';
 
+/*
+|--------------------------------------------------------------------------
+| Administration
+|--------------------------------------------------------------------------
+*/
 import { UserManagement } from '../../features/admin/components/UserManagement';
-import { OrganizationManagementPage } from '../../features/organization/pages/OrganizationManagementPage';
 import { AuditLogs } from '../../features/admin/components/AuditLogs';
+import { OrganizationManagementPage } from '../../features/organization/pages/OrganizationManagementPage';
 
 const router = createBrowserRouter([
   /*
@@ -73,7 +121,12 @@ const router = createBrowserRouter([
       },
       {
         index: true,
-        element: <Navigate to="/auth/login" replace />,
+        element: (
+          <Navigate
+            to="/auth/login"
+            replace
+          />
+        ),
       },
     ],
   },
@@ -89,13 +142,31 @@ const router = createBrowserRouter([
   */
   {
     path: '/reset-password',
-    element: (
-      <AuthLayout />
-    ),
+    element: <AuthLayout />,
     children: [
       {
         index: true,
         element: <ResetPasswordPage />,
+      },
+    ],
+  },
+
+  /*
+  |--------------------------------------------------------------------------
+  | Organization Invitation
+  |--------------------------------------------------------------------------
+  |
+  | Invitation acceptance is public because invited users may not
+  | have an authenticated session yet.
+  |
+  */
+  {
+    path: '/invitations/accept',
+    element: <AuthLayout />,
+    children: [
+      {
+        index: true,
+        element: <AcceptInvitationPage />,
       },
     ],
   },
@@ -120,6 +191,27 @@ const router = createBrowserRouter([
     children: [
       /*
       |--------------------------------------------------------------------------
+      | Profile & Security
+      |--------------------------------------------------------------------------
+      */
+      {
+        path: 'profile',
+        element: <ProfilePage />,
+      },
+      {
+        path: 'profile/sessions',
+        element: <SessionsPage />,
+      },
+      {
+        path: 'profile/security',
+        element: <SecurityPage />,
+      },
+      {
+        path: 'profile/security/mfa/setup',
+        element: <MfaSetupPage />,
+      },
+      /*
+      |--------------------------------------------------------------------------
       | Dashboard
       |--------------------------------------------------------------------------
       */
@@ -127,10 +219,14 @@ const router = createBrowserRouter([
         path: 'dashboard',
         element: <DashboardRouter />,
       },
-
       {
         index: true,
-        element: <Navigate to="/dashboard" replace />,
+        element: (
+          <Navigate
+            to="/dashboard"
+            replace
+          />
+        ),
       },
 
       /*
@@ -414,31 +510,22 @@ const router = createBrowserRouter([
         path: 'ai-tutor',
         element: <AITutor />,
       },
-
-      /*
-      |--------------------------------------------------------------------------
-      | Profile / Security
-      |--------------------------------------------------------------------------
-      */
-      {
-        path: 'profile',
-        element: <SessionsPage />,
-      },
-      {
-        path: 'security/sessions',
-        element: <SessionsPage />,
-      },
     ],
   },
 
   /*
   |--------------------------------------------------------------------------
-  | Unknown routes
+  | Unknown Routes
   |--------------------------------------------------------------------------
   */
   {
     path: '*',
-    element: <Navigate to="/dashboard" replace />,
+    element: (
+      <Navigate
+        to="/dashboard"
+        replace
+      />
+    ),
   },
 ]);
 

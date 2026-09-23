@@ -3,6 +3,7 @@ import { organizationApi } from '../../../services/api/organization.api';
 
 export const organizationMemberKeys = {
   all: ['organization-members'] as const,
+
   list: (
     organizationId: string,
     params?: Record<string, string | number>,
@@ -19,15 +20,25 @@ export function useOrganizationMembers(
 ) {
   return useQuery({
     queryKey: organizationId
-      ? organizationMemberKeys.list(organizationId, params)
+      ? organizationMemberKeys.list(
+          organizationId,
+          params,
+        )
       : ['organization-members', 'disabled'],
+
     queryFn: () => {
       if (!organizationId) {
-        throw new Error('Organization ID is required.');
+        throw new Error(
+          'Organization ID is required.',
+        );
       }
 
-      return organizationApi.getMembers(organizationId, params);
+      return organizationApi.getMembers(
+        organizationId,
+        params,
+      );
     },
+
     enabled: Boolean(organizationId),
   });
 }

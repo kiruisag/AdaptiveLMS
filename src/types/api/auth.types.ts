@@ -41,3 +41,22 @@ export interface VerifyEmailPayload {
   token: string;
   email?: string;
 }
+export interface MfaStatusDTO {
+  enabled: boolean;
+  method?: string | null;
+}
+
+export interface MfaSetupDTO {
+  type: string;
+  secret: string;
+  provisioning_uri: string;
+}
+export interface MfaRecoveryCodeStatusDTO {
+  total: number;
+  used: number;
+  remaining: number;
+}
+
+export interface MfaRecoveryCodesDTO {
+  codes: string[];
+}

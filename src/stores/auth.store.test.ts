@@ -325,3 +325,178 @@ test('clearing active organization does not log the user out', async () => {
 
   await resetStore();
 });
+
+test('active organization selection is persisted by UUID', async () => {
+  await resetStore();
+
+  const store = useAuth.getState();
+  const organizations = createOrganizations();
+
+  store.setAuth(
+    createUser(organizations),
+    'token-123',
+  );
+
+  store.setActiveOrganization(
+    organizations[1],
+  );
+
+  assert.equal(
+    localStorage.getItem(
+      'active_organization_uuid',
+    ),
+    'org-uuid-2',
+  );
+
+  await resetStore();
+});
+
+test('checkAuth restores the persisted active organization from /me', async () => {
+  await resetStore();
+
+  const organizations = createOrganizations();
+
+  localStorage.setItem(
+    'access_token',
+    'token-123',
+  );
+
+  localStorage.setItem(
+    'active_organization_uuid',
+    'org-uuid-2',
+  );
+
+  const originalMe = authApi.me;
+
+  authApi.me = async () =>
+    createUser(organizations);
+
+  try {
+    await useAuth.getState().checkAuth();
+
+    const state = useAuth.getState();
+
+    assert.equal(
+      state.status,
+      'authenticated',
+    );
+
+    assert.equal(
+      state.activeOrganization?.uuid,
+      'org-uuid-2',
+    );
+
+    assert.equal(
+      state.activeOrganization?.name,
+      'Acme Training',
+    );
+
+    assert.equal(
+      localStorage.getItem(
+        'active_organization_uuid',
+      ),
+      'org-uuid-2',
+    );
+  } finally {
+    authApi.me = originalMe;
+    await resetStore();
+  }
+});
+
+test('checkAuth clears a persisted organization that is no longer available', async () => {
+  await resetStore();
+
+  localStorage.setItem(
+    'access_token',
+    'token-123',
+  );
+
+  localStorage.setItem(
+    'active_organization_uuid',
+    'org-no-longer-available',
+  );
+
+  const originalMe = authApi.me;
+
+  authApi.me = async () =>
+    createUser([
+      {
+        uuid: 'org-current',
+        name: 'Current Organization',
+        slug: 'current-organization',
+        status: 'active',
+      },
+    ]);
+
+  try {
+    await useAuth.getState().checkAuth();
+
+    const state = useAuth.getState();
+
+    assert.equal(
+      state.status,
+      'authenticated',
+    );
+
+    assert.equal(
+      state.activeOrganization,
+      null,
+    );
+
+    assert.equal(
+      localStorage.getItem(
+        'active_organization_uuid',
+      ),
+      null,
+    );
+  } finally {
+    authApi.me = originalMe;
+    await resetStore();
+  }
+});
+
+test('checkAuth automatically selects the only available organization', async () => {
+  await resetStore();
+
+  const organization: OrganizationDTO = {
+    uuid: 'only-org',
+    name: 'Only Organization',
+    slug: 'only-organization',
+    status: 'active',
+  };
+
+  localStorage.setItem(
+    'access_token',
+    'token-123',
+  );
+
+  localStorage.removeItem(
+    'active_organization_uuid',
+  );
+
+  const originalMe = authApi.me;
+
+  authApi.me = async () =>
+    createUser([organization]);
+
+  try {
+    await useAuth.getState().checkAuth();
+
+    const state = useAuth.getState();
+
+    assert.equal(
+      state.activeOrganization?.uuid,
+      'only-org',
+    );
+
+    assert.equal(
+      localStorage.getItem(
+        'active_organization_uuid',
+      ),
+      'only-org',
+    );
+  } finally {
+    authApi.me = originalMe;
+    await resetStore();
+  }
+});

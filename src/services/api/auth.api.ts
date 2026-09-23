@@ -9,7 +9,16 @@ import type {
   VerifyEmailPayload,
   SessionDTO,
   OrganizationDTO,
+  MfaStatusDTO,
+  MfaSetupDTO,
+  MfaRecoveryCodeStatusDTO,
+  MfaRecoveryCodesDTO,
 } from '../../types';
+
+import type {
+  UpdateProfilePayload,
+  ChangePasswordPayload,
+} from '../../features/auth/types/profile.types';
 
 const toUserDTO = (payload: Partial<UserDTO> | null | undefined): UserDTO => {
   const joinedName = [payload?.first_name, payload?.last_name].filter(Boolean).join(' ');
@@ -138,6 +147,47 @@ export const authApi = {
       throw normalizeApiError(error);
     }
   },
+    updateProfile: async (
+    payload: UpdateProfilePayload,
+  ) => {
+    try {
+      const { data } = await apiClient.patch(
+        '/auth/profile',
+        payload,
+      );
+
+      const resource =
+        data?.data ?? data;
+
+      return {
+        user: toAuthUserDTO(resource),
+        message:
+          data?.message ??
+          'Profile updated successfully.',
+      };
+    } catch (error) {
+      throw normalizeApiError(error);
+    }
+  },
+
+  changePassword: async (
+    payload: ChangePasswordPayload,
+  ) => {
+    try {
+      const { data } = await apiClient.patch(
+        '/auth/password',
+        payload,
+      );
+
+      return {
+        message:
+          data?.message ??
+          'Password changed successfully.',
+      };
+    } catch (error) {
+      throw normalizeApiError(error);
+    }
+  },
 
   logout: async () => {
     try {
@@ -229,5 +279,97 @@ export const authApi = {
 
   registerOrganization: async (data: RegisterPayload) => {
     return authApi.register(data);
+  },
+  getMfaStatus: async (): Promise<MfaStatusDTO> => {
+  try {
+    const { data } = await apiClient.get('/auth/mfa');
+
+    return (data?.data ?? data) as MfaStatusDTO;
+  } catch (error) {
+    throw normalizeApiError(error);
+  }
+},
+
+setupMfa: async (): Promise<MfaSetupDTO> => {
+  try {
+    const { data } = await apiClient.post('/auth/mfa/setup');
+
+    const payload = data?.data ?? data;
+
+    return {
+      type: payload.type,
+      secret: payload.secret,
+      provisioning_uri: payload.provisioning_uri,
+    };
+  } catch (error) {
+    throw normalizeApiError(error);
+  }
+},
+
+verifyMfa: async (payload: {
+  code: string;
+}) => {
+  try {
+    const { data } = await apiClient.post(
+      '/auth/mfa/verify',
+      payload,
+    );
+
+    return {
+      data: data?.data ?? data,
+      message:
+        data?.message ??
+        'Multi-factor authentication enabled successfully.',
+    };
+  } catch (error) {
+    throw normalizeApiError(error);
+  }
+},
+
+disableMfa: async (payload: {
+  code?: string;
+  password?: string;
+}) => {
+  try {
+    const { data } = await apiClient.post(
+      '/auth/mfa/disable',
+      payload,
+    );
+
+    return {
+      data: data?.data ?? data,
+      message:
+        data?.message ??
+        'Multi-factor authentication disabled successfully.',
+    };
+  } catch (error) {
+    throw normalizeApiError(error);
+  }
+},
+
+getMfaRecoveryCodeStatus:
+  async (): Promise<MfaRecoveryCodeStatusDTO> => {
+    try {
+      const { data } = await apiClient.get(
+        '/auth/mfa/recovery-codes',
+      );
+
+      return (data?.data ?? data) as MfaRecoveryCodeStatusDTO;
+    } catch (error) {
+      throw normalizeApiError(error);
+    }
+  },
+
+generateMfaRecoveryCodes:
+  async (): Promise<MfaRecoveryCodesDTO> => {
+    try {
+      const { data } = await apiClient.post(
+        '/auth/mfa/recovery-codes',
+      );
+
+      return (data?.data ?? data) as MfaRecoveryCodesDTO;
+    } catch (error) {
+      throw normalizeApiError(error);
+    }
   },
 };

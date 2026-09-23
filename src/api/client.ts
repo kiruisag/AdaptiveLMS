@@ -99,6 +99,7 @@ apiClient.interceptors.response.use(
         '/auth/resend-verification',
         '/auth/forgot-password',
         '/auth/reset-password',
+        '/auth/invitations/complete',
       ];
 
       const requestUrl = String(originalRequest.url ?? '');
